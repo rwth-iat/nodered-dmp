@@ -1,0 +1,484 @@
+{
+  "modelType": "Submodel",
+  "kind": "Instance",
+  "semanticId": {
+    "keys": [
+      {
+        "type": "GlobalReference",
+        "value": "https://admin-shell.io/idta/AssetInterfacesMappingConfiguration/1/0/Submodel"
+      }
+    ],
+    "type": "ExternalReference"
+  },
+  "id": "https://example.com/ids/sm/AssetInterfacesMappingConfiguration",
+  "idShort": "AssetInterfacesMappingConfiguration",
+  "submodelElements": [
+    {
+      "modelType": "SubmodelElementList",
+      "semanticId": {
+        "keys": [
+          {
+            "type": "GlobalReference",
+            "value": "https://admin-shell.io/idta/AssetInterfacesMappingConfiguration/1/0/MappingConfigurations"
+          }
+        ],
+        "type": "ExternalReference"
+      },
+      "idShort": "MappingConfigurations",
+      "orderRelevant": true,
+      "semanticIdListElement": {
+        "keys": [
+          {
+            "type": "GlobalReference",
+            "value": "https://admin-shell.io/idta/AssetInterfacesMappingConfiguration/1/0/MappingConfiguration"
+          }
+        ],
+        "type": "ExternalReference"
+      },
+      "typeValueListElement": "SubmodelElementCollection",
+      "value": [
+        {
+          "modelType": "SubmodelElementCollection",
+          "value": [
+            {
+              "modelType": "ReferenceElement",
+              "semanticId": {
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "https://admin-shell.io/idta/AssetInterfacesMappingConfiguration/1/0/InterfaceReference"
+                  }
+                ],
+                "type": "ExternalReference"
+              },
+              "idShort": "InterfaceReference",
+              "value": {
+                "keys": [
+                  {
+                    "type": "Submodel",
+                    "value": "https://example.com/ids/sm/AssetInterfacesDescription"
+                  },
+                  {
+                    "type": "SubmodelElementCollection",
+                    "value": "InterfaceHTTP"
+                  }
+                ],
+                "type": "ModelReference"
+              }
+            },
+            {
+              "modelType": "SubmodelElementList",
+              "semanticId": {
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "https://admin-shell.io/idta/AssetInterfacesMappingConfiguration/1/0/MappingSourceSinkRelations"
+                  }
+                ],
+                "type": "ExternalReference"
+              },
+              "idShort": "MappingSourceSinkRelations",
+              "orderRelevant": true,
+              "semanticIdListElement": {
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "https://admin-shell.io/idta/AssetInterfacesMappingConfiguration/1/0/MappingSourceSinkRelation"
+                  }
+                ],
+                "type": "ExternalReference"
+              },
+              "typeValueListElement": "RelationshipElement",
+              "value": [
+                {
+                  "modelType": "RelationshipElement",
+                  "first": {
+                    "keys": [
+                      {
+                        "type": "Submodel",
+                        "value": "https://example.com/ids/sm/AssetInterfacesDescription"
+                      },
+                      {
+                        "type": "SubmodelElementCollection",
+                        "value": "InterfaceHTTP"
+                      },
+                      {
+                        "type": "SubmodelElementCollection",
+                        "value": "InterfaceMetadata"
+                      },
+                      {
+                        "type": "SubmodelElementCollection",
+                        "value": "Properties"
+                      },
+                      {
+                        "type": "SubmodelElementCollection",
+                        "value": "voltage"
+                      }
+                    ],
+                    "type": "ModelReference"
+                  },
+                  "second": {
+                    "keys": [
+                      {
+                        "type": "Submodel",
+                        "value": "https://example.com/ids/sm/OperationalData"
+                      },
+                      {
+                        "type": "SubmodelElementCollection",
+                        "value": "HTTP_Data"
+                      },
+                      {
+                        "type": "Property",
+                        "value": "voltage"
+                      }
+                    ],
+                    "type": "ModelReference"
+                  }
+                },
+                {
+                  "modelType": "RelationshipElement",
+                  "first": {
+                    "keys": [
+                      {
+                        "type": "Submodel",
+                        "value": "https://example.com/ids/sm/AssetInterfacesDescription"
+                      },
+                      {
+                        "type": "SubmodelElementCollection",
+                        "value": "InterfaceHTTP"
+                      },
+                      {
+                        "type": "SubmodelElementCollection",
+                        "value": "InterfaceMetadata"
+                      },
+                      {
+                        "type": "SubmodelElementCollection",
+                        "value": "Properties"
+                      },
+                      {
+                        "type": "SubmodelElementCollection",
+                        "value": "status"
+                      }
+                    ],
+                    "type": "ModelReference"
+                  },
+                  "second": {
+                    "keys": [
+                      {
+                        "type": "Submodel",
+                        "value": "https://example.com/ids/sm/OperationalData"
+                      },
+                      {
+                        "type": "SubmodelElementCollection",
+                        "value": "HTTP_Data"
+                      },
+                      {
+                        "type": "Property",
+                        "value": "status"
+                      }
+                    ],
+                    "type": "ModelReference"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "modelType": "SubmodelElementCollection",
+          "value": [
+            {
+              "modelType": "ReferenceElement",
+              "semanticId": {
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "https://admin-shell.io/idta/AssetInterfacesMappingConfiguration/1/0/InterfaceReference"
+                  }
+                ],
+                "type": "ExternalReference"
+              },
+              "idShort": "InterfaceReference",
+              "value": {
+                "keys": [
+                  {
+                    "type": "Submodel",
+                    "value": "https://example.com/ids/sm/AssetInterfacesDescription"
+                  },
+                  {
+                    "type": "SubmodelElementCollection",
+                    "value": "InterfaceMODBUS"
+                  }
+                ],
+                "type": "ModelReference"
+              }
+            },
+            {
+              "modelType": "SubmodelElementList",
+              "semanticId": {
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "https://admin-shell.io/idta/AssetInterfacesMappingConfiguration/1/0/MappingSourceSinkRelations"
+                  }
+                ],
+                "type": "ExternalReference"
+              },
+              "idShort": "MappingSourceSinkRelations",
+              "orderRelevant": true,
+              "semanticIdListElement": {
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "https://admin-shell.io/idta/AssetInterfacesMappingConfiguration/1/0/MappingSourceSinkRelation"
+                  }
+                ],
+                "type": "ExternalReference"
+              },
+              "typeValueListElement": "RelationshipElement",
+              "value": [
+                {
+                  "modelType": "RelationshipElement",
+                  "first": {
+                    "keys": [
+                      {
+                        "type": "Submodel",
+                        "value": "https://example.com/ids/sm/AssetInterfacesDescription"
+                      },
+                      {
+                        "type": "SubmodelElementCollection",
+                        "value": "InterfaceMODBUS"
+                      },
+                      {
+                        "type": "SubmodelElementCollection",
+                        "value": "InterfaceMetadata"
+                      },
+                      {
+                        "type": "SubmodelElementCollection",
+                        "value": "Properties"
+                      },
+                      {
+                        "type": "SubmodelElementCollection",
+                        "value": "voltage"
+                      }
+                    ],
+                    "type": "ModelReference"
+                  },
+                  "second": {
+                    "keys": [
+                      {
+                        "type": "Submodel",
+                        "value": "https://example.com/ids/sm/OperationalData"
+                      },
+                      {
+                        "type": "SubmodelElementCollection",
+                        "value": "MODBUS_Data"
+                      },
+                      {
+                        "type": "Property",
+                        "value": "voltage"
+                      }
+                    ],
+                    "type": "ModelReference"
+                  }
+                },
+                {
+                  "modelType": "RelationshipElement",
+                  "first": {
+                    "keys": [
+                      {
+                        "type": "Submodel",
+                        "value": "https://example.com/ids/sm/AssetInterfacesDescription"
+                      },
+                      {
+                        "type": "SubmodelElementCollection",
+                        "value": "InterfaceMODBUS"
+                      },
+                      {
+                        "type": "SubmodelElementCollection",
+                        "value": "InterfaceMetadata"
+                      },
+                      {
+                        "type": "SubmodelElementCollection",
+                        "value": "Properties"
+                      },
+                      {
+                        "type": "SubmodelElementCollection",
+                        "value": "status"
+                      }
+                    ],
+                    "type": "ModelReference"
+                  },
+                  "second": {
+                    "keys": [
+                      {
+                        "type": "Submodel",
+                        "value": "https://example.com/ids/sm/OperationalData"
+                      },
+                      {
+                        "type": "SubmodelElementCollection",
+                        "value": "MODBUS_Data"
+                      },
+                      {
+                        "type": "Property",
+                        "value": "status"
+                      }
+                    ],
+                    "type": "ModelReference"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "modelType": "SubmodelElementCollection",
+          "value": [
+            {
+              "modelType": "ReferenceElement",
+              "semanticId": {
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "https://admin-shell.io/idta/AssetInterfacesMappingConfiguration/1/0/InterfaceReference"
+                  }
+                ],
+                "type": "ExternalReference"
+              },
+              "idShort": "InterfaceReference",
+              "value": {
+                "keys": [
+                  {
+                    "type": "Submodel",
+                    "value": "https://example.com/ids/sm/AssetInterfacesDescription"
+                  },
+                  {
+                    "type": "SubmodelElementCollection",
+                    "value": "InterfaceMQTT"
+                  }
+                ],
+                "type": "ModelReference"
+              }
+            },
+            {
+              "modelType": "SubmodelElementList",
+              "semanticId": {
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "https://admin-shell.io/idta/AssetInterfacesMappingConfiguration/1/0/MappingSourceSinkRelations"
+                  }
+                ],
+                "type": "ExternalReference"
+              },
+              "idShort": "MappingSourceSinkRelations",
+              "orderRelevant": true,
+              "semanticIdListElement": {
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "https://admin-shell.io/idta/AssetInterfacesMappingConfiguration/1/0/MappingSourceSinkRelation"
+                  }
+                ],
+                "type": "ExternalReference"
+              },
+              "typeValueListElement": "RelationshipElement",
+              "value": [
+                {
+                  "modelType": "RelationshipElement",
+                  "first": {
+                    "keys": [
+                      {
+                        "type": "Submodel",
+                        "value": "https://example.com/ids/sm/AssetInterfacesDescription"
+                      },
+                      {
+                        "type": "SubmodelElementCollection",
+                        "value": "InterfaceMQTT"
+                      },
+                      {
+                        "type": "SubmodelElementCollection",
+                        "value": "InterfaceMetadata"
+                      },
+                      {
+                        "type": "SubmodelElementCollection",
+                        "value": "Properties"
+                      },
+                      {
+                        "type": "SubmodelElementCollection",
+                        "value": "voltage"
+                      }
+                    ],
+                    "type": "ModelReference"
+                  },
+                  "second": {
+                    "keys": [
+                      {
+                        "type": "Submodel",
+                        "value": "https://example.com/ids/sm/OperationalData"
+                      },
+                      {
+                        "type": "SubmodelElementCollection",
+                        "value": "MQTT_Data"
+                      },
+                      {
+                        "type": "Property",
+                        "value": "voltage"
+                      }
+                    ],
+                    "type": "ModelReference"
+                  }
+                },
+                {
+                  "modelType": "RelationshipElement",
+                  "first": {
+                    "keys": [
+                      {
+                        "type": "Submodel",
+                        "value": "https://example.com/ids/sm/AssetInterfacesDescription"
+                      },
+                      {
+                        "type": "SubmodelElementCollection",
+                        "value": "InterfaceMQTT"
+                      },
+                      {
+                        "type": "SubmodelElementCollection",
+                        "value": "InterfaceMetadata"
+                      },
+                      {
+                        "type": "SubmodelElementCollection",
+                        "value": "Properties"
+                      },
+                      {
+                        "type": "SubmodelElementCollection",
+                        "value": "status"
+                      }
+                    ],
+                    "type": "ModelReference"
+                  },
+                  "second": {
+                    "keys": [
+                      {
+                        "type": "Submodel",
+                        "value": "https://example.com/ids/sm/OperationalData"
+                      },
+                      {
+                        "type": "SubmodelElementCollection",
+                        "value": "MQTT_Data"
+                      },
+                      {
+                        "type": "Property",
+                        "value": "status"
+                      }
+                    ],
+                    "type": "ModelReference"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

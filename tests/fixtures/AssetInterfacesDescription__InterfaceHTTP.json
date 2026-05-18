@@ -1,0 +1,766 @@
+{
+  "modelType": "SubmodelElementCollection",
+  "semanticId": {
+    "keys": [
+      {
+        "type": "GlobalReference",
+        "value": "http://www.w3.org/2011/http#"
+      }
+    ],
+    "type": "ExternalReference"
+  },
+  "idShort": "InterfaceHTTP",
+  "value": [
+    {
+      "modelType": "Property",
+      "semanticId": {
+        "keys": [
+          {
+            "type": "GlobalReference",
+            "value": "https://www.w3.org/2019/wot/td#title"
+          }
+        ],
+        "type": "ExternalReference"
+      },
+      "value": "DeviceSample",
+      "valueType": "xs:string",
+      "idShort": "title"
+    },
+    {
+      "modelType": "Property",
+      "semanticId": {
+        "keys": [
+          {
+            "type": "GlobalReference",
+            "value": "https://www.w3.org/2019/wot/td#supportContact"
+          }
+        ],
+        "type": "ExternalReference"
+      },
+      "value": "https://github.com/eclipse-thingweb/node-wot/",
+      "valueType": "xs:anyURI",
+      "idShort": "support"
+    },
+    {
+      "modelType": "SubmodelElementCollection",
+      "idShort": "EndpointMetadata",
+      "value": [
+        {
+          "modelType": "Property",
+          "semanticId": {
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://www.w3.org/2019/wot/td#base"
+              }
+            ],
+            "type": "ExternalReference"
+          },
+          "value": "http://localhost:8083",
+          "valueType": "xs:anyURI",
+          "idShort": "base"
+        },
+        {
+          "modelType": "Property",
+          "semanticId": {
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://www.w3.org/2019/wot/hypermedia#forContentType"
+              }
+            ],
+            "type": "ExternalReference"
+          },
+          "value": "application/json",
+          "valueType": "xs:string",
+          "idShort": "contentType"
+        },
+        {
+          "modelType": "SubmodelElementCollection",
+          "semanticId": {
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://www.w3.org/2019/wot/td#definesSecurityScheme"
+              }
+            ],
+            "type": "ExternalReference"
+          },
+          "idShort": "securityDefinitions",
+          "value": [
+            {
+              "modelType": "SubmodelElementCollection",
+              "idShort": "nosec_sc",
+              "value": [
+                {
+                  "modelType": "Property",
+                  "value": "nosec",
+                  "valueType": "xs:string",
+                  "idShort": "scheme"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "modelType": "SubmodelElementCollection",
+      "semanticId": {
+        "keys": [
+          {
+            "type": "GlobalReference",
+            "value": "https://www.w3.org/2019/wot/td#InteractionAffordance"
+          }
+        ],
+        "type": "ExternalReference"
+      },
+      "idShort": "InterfaceMetadata",
+      "value": [
+        {
+          "modelType": "SubmodelElementCollection",
+          "semanticId": {
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://www.w3.org/2019/wot/td#PropertyAffordance"
+              }
+            ],
+            "type": "ExternalReference"
+          },
+          "idShort": "Properties",
+          "value": [
+            {
+              "modelType": "SubmodelElementCollection",
+              "semanticId": {
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "https://www.w3.org/2019/wot/td#hasPropertyAffordance"
+                  }
+                ],
+                "type": "ExternalReference"
+              },
+              "description": [
+                {
+                  "language": "en",
+                  "text": "Current counter value"
+                },
+                {
+                  "language": "de",
+                  "text": "Derzeitiger Z\u00e4hlerwert"
+                },
+                {
+                  "language": "it",
+                  "text": "Valore attuale del contatore"
+                }
+              ],
+              "idShort": "voltage",
+              "value": [
+                {
+                  "modelType": "Property",
+                  "semanticId": {
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+                      }
+                    ],
+                    "type": "ExternalReference"
+                  },
+                  "value": "integer",
+                  "valueType": "xs:string",
+                  "idShort": "type"
+                },
+                {
+                  "modelType": "Property",
+                  "semanticId": {
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://www.w3.org/2019/wot/td#title"
+                      }
+                    ],
+                    "type": "ExternalReference"
+                  },
+                  "value": "voltage",
+                  "valueType": "xs:string",
+                  "idShort": "title"
+                },
+                {
+                  "modelType": "Property",
+                  "semanticId": {
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://www.w3.org/2019/wot/td#isObservable"
+                      }
+                    ],
+                    "type": "ExternalReference"
+                  },
+                  "value": "true",
+                  "valueType": "xs:boolean",
+                  "idShort": "observable"
+                },
+                {
+                  "modelType": "Property",
+                  "semanticId": {
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://www.w3.org/2019/wot/json-schema#const"
+                      }
+                    ],
+                    "type": "ExternalReference"
+                  },
+                  "value": "22",
+                  "valueType": "xs:int",
+                  "idShort": "const"
+                },
+                {
+                  "modelType": "Property",
+                  "semanticId": {
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://www.w3.org/2019/wot/json-schema#default"
+                      }
+                    ],
+                    "type": "ExternalReference"
+                  },
+                  "value": "integer",
+                  "valueType": "xs:string",
+                  "idShort": "default"
+                },
+                {
+                  "modelType": "Property",
+                  "semanticId": {
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://schema.org/unitCode"
+                      }
+                    ],
+                    "type": "ExternalReference"
+                  },
+                  "value": "V",
+                  "valueType": "xs:string",
+                  "idShort": "unit"
+                },
+                {
+                  "modelType": "Range",
+                  "semanticId": {
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://www.w3.org/2019/wot/json-schema#minimum"
+                      }
+                    ],
+                    "type": "ExternalReference"
+                  },
+                  "supplementalSemanticIds": [
+                    {
+                      "keys": [
+                        {
+                          "type": "GlobalReference",
+                          "value": "https://www.w3.org/2019/wot/json-schema#maximum"
+                        }
+                      ],
+                      "type": "ExternalReference"
+                    }
+                  ],
+                  "max": "100",
+                  "min": "1",
+                  "valueType": "xs:integer",
+                  "idShort": "range"
+                },
+                {
+                  "modelType": "SubmodelElementCollection",
+                  "semanticId": {
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://www.w3.org/2019/wot/td#hasForm"
+                      }
+                    ],
+                    "type": "ExternalReference"
+                  },
+                  "idShort": "forms",
+                  "value": [
+                    {
+                      "modelType": "Property",
+                      "semanticId": {
+                        "keys": [
+                          {
+                            "type": "GlobalReference",
+                            "value": "https://www.w3.org/2019/wot/hypermedia#hasTarget"
+                          }
+                        ],
+                        "type": "ExternalReference"
+                      },
+                      "value": "/sampleDevice/properties/voltage",
+                      "valueType": "xs:string",
+                      "idShort": "href"
+                    },
+                    {
+                      "modelType": "Property",
+                      "semanticId": {
+                        "keys": [
+                          {
+                            "type": "GlobalReference",
+                            "value": "https://www.w3.org/2011/http#methodName"
+                          }
+                        ],
+                        "type": "ExternalReference"
+                      },
+                      "value": "GET",
+                      "valueType": "xs:string",
+                      "idShort": "htv_methodName"
+                    },
+                    {
+                      "modelType": "Property",
+                      "semanticId": {
+                        "keys": [
+                          {
+                            "type": "GlobalReference",
+                            "value": "https://www.w3.org/2019/wot/hypermedia#forContentType"
+                          }
+                        ],
+                        "type": "ExternalReference"
+                      },
+                      "value": "application/json",
+                      "valueType": "xs:string",
+                      "idShort": "contentType"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "modelType": "SubmodelElementCollection",
+              "description": [
+                {
+                  "language": "en",
+                  "text": "Current counter value as SVG image"
+                },
+                {
+                  "language": "de",
+                  "text": "Aktueller Z\u00e4hlerwert als SVG-Bild"
+                },
+                {
+                  "language": "it",
+                  "text": "Valore attuale del contatore come immagine SVG"
+                }
+              ],
+              "idShort": "status",
+              "value": [
+                {
+                  "modelType": "Property",
+                  "semanticId": {
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+                      }
+                    ],
+                    "type": "ExternalReference"
+                  },
+                  "value": "string",
+                  "valueType": "xs:string",
+                  "idShort": "type"
+                },
+                {
+                  "modelType": "Property",
+                  "semanticId": {
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://www.w3.org/2019/wot/td#title"
+                      }
+                    ],
+                    "type": "ExternalReference"
+                  },
+                  "value": "status",
+                  "valueType": "xs:string",
+                  "idShort": "title"
+                },
+                {
+                  "modelType": "Property",
+                  "semanticId": {
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://www.w3.org/2019/wot/json-schema#const"
+                      }
+                    ],
+                    "type": "ExternalReference"
+                  },
+                  "value": "22",
+                  "valueType": "xs:int",
+                  "idShort": "const"
+                },
+                {
+                  "modelType": "Property",
+                  "semanticId": {
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://www.w3.org/2019/wot/json-schema#default"
+                      }
+                    ],
+                    "type": "ExternalReference"
+                  },
+                  "value": "integer",
+                  "valueType": "xs:string",
+                  "idShort": "default"
+                },
+                {
+                  "modelType": "Property",
+                  "semanticId": {
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://schema.org/unitCode"
+                      }
+                    ],
+                    "type": "ExternalReference"
+                  },
+                  "valueType": "xs:string",
+                  "idShort": "unit"
+                },
+                {
+                  "modelType": "Property",
+                  "value": "false",
+                  "valueType": "xs:boolean",
+                  "idShort": "observable"
+                },
+                {
+                  "modelType": "Range",
+                  "semanticId": {
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://www.w3.org/2019/wot/json-schema#minimum"
+                      }
+                    ],
+                    "type": "ExternalReference"
+                  },
+                  "supplementalSemanticIds": [
+                    {
+                      "keys": [
+                        {
+                          "type": "GlobalReference",
+                          "value": "https://www.w3.org/2019/wot/json-schema#maximum"
+                        }
+                      ],
+                      "type": "ExternalReference"
+                    }
+                  ],
+                  "max": "25",
+                  "min": "1",
+                  "valueType": "xs:integer",
+                  "idShort": "lengthRange"
+                },
+                {
+                  "modelType": "SubmodelElementCollection",
+                  "semanticId": {
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://www.w3.org/2019/wot/td#hasForm"
+                      }
+                    ],
+                    "type": "ExternalReference"
+                  },
+                  "idShort": "forms",
+                  "value": [
+                    {
+                      "modelType": "Property",
+                      "semanticId": {
+                        "keys": [
+                          {
+                            "type": "GlobalReference",
+                            "value": "https://www.w3.org/2019/wot/hypermedia#hasTarget"
+                          }
+                        ],
+                        "type": "ExternalReference"
+                      },
+                      "value": "/sampleDevice/properties/status",
+                      "valueType": "xs:string",
+                      "idShort": "href"
+                    },
+                    {
+                      "modelType": "Property",
+                      "value": "PUT",
+                      "valueType": "xs:string",
+                      "idShort": "htv_methodName"
+                    },
+                    {
+                      "modelType": "Property",
+                      "semanticId": {
+                        "keys": [
+                          {
+                            "type": "GlobalReference",
+                            "value": "https://www.w3.org/2019/wot/hypermedia#forContentType"
+                          }
+                        ],
+                        "type": "ExternalReference"
+                      },
+                      "value": "application/json",
+                      "valueType": "xs:string",
+                      "idShort": "contentType"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "modelType": "SubmodelElementCollection",
+              "semanticId": {
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "https://www.w3.org/2019/wot/td#hasPropertyAffordance"
+                  }
+                ],
+                "type": "ExternalReference"
+              },
+              "description": [
+                {
+                  "language": "en",
+                  "text": "Current counter value"
+                },
+                {
+                  "language": "de",
+                  "text": "Derzeitiger Z\u00e4hlerwert"
+                },
+                {
+                  "language": "it",
+                  "text": "Valore attuale del contatore"
+                }
+              ],
+              "idShort": "current",
+              "value": [
+                {
+                  "modelType": "Property",
+                  "semanticId": {
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+                      }
+                    ],
+                    "type": "ExternalReference"
+                  },
+                  "value": "integer",
+                  "valueType": "xs:string",
+                  "idShort": "type"
+                },
+                {
+                  "modelType": "Property",
+                  "semanticId": {
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://www.w3.org/2019/wot/td#title"
+                      }
+                    ],
+                    "type": "ExternalReference"
+                  },
+                  "value": "voltage",
+                  "valueType": "xs:string",
+                  "idShort": "title"
+                },
+                {
+                  "modelType": "Property",
+                  "semanticId": {
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://www.w3.org/2019/wot/td#isObservable"
+                      }
+                    ],
+                    "type": "ExternalReference"
+                  },
+                  "value": "true",
+                  "valueType": "xs:boolean",
+                  "idShort": "observable"
+                },
+                {
+                  "modelType": "Property",
+                  "semanticId": {
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://www.w3.org/2019/wot/json-schema#const"
+                      }
+                    ],
+                    "type": "ExternalReference"
+                  },
+                  "value": "22",
+                  "valueType": "xs:int",
+                  "idShort": "const"
+                },
+                {
+                  "modelType": "Property",
+                  "semanticId": {
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://www.w3.org/2019/wot/json-schema#default"
+                      }
+                    ],
+                    "type": "ExternalReference"
+                  },
+                  "value": "integer",
+                  "valueType": "xs:string",
+                  "idShort": "default"
+                },
+                {
+                  "modelType": "Property",
+                  "semanticId": {
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://schema.org/unitCode"
+                      }
+                    ],
+                    "type": "ExternalReference"
+                  },
+                  "value": "V",
+                  "valueType": "xs:string",
+                  "idShort": "unit"
+                },
+                {
+                  "modelType": "Range",
+                  "semanticId": {
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://www.w3.org/2019/wot/json-schema#minimum"
+                      }
+                    ],
+                    "type": "ExternalReference"
+                  },
+                  "supplementalSemanticIds": [
+                    {
+                      "keys": [
+                        {
+                          "type": "GlobalReference",
+                          "value": "https://www.w3.org/2019/wot/json-schema#maximum"
+                        }
+                      ],
+                      "type": "ExternalReference"
+                    }
+                  ],
+                  "max": "100",
+                  "min": "1",
+                  "valueType": "xs:integer",
+                  "idShort": "range"
+                },
+                {
+                  "modelType": "SubmodelElementCollection",
+                  "semanticId": {
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://www.w3.org/2019/wot/td#hasForm"
+                      }
+                    ],
+                    "type": "ExternalReference"
+                  },
+                  "idShort": "forms",
+                  "value": [
+                    {
+                      "modelType": "Property",
+                      "semanticId": {
+                        "keys": [
+                          {
+                            "type": "GlobalReference",
+                            "value": "https://www.w3.org/2019/wot/hypermedia#hasTarget"
+                          }
+                        ],
+                        "type": "ExternalReference"
+                      },
+                      "value": "/sampleDevice/properties/current",
+                      "valueType": "xs:string",
+                      "idShort": "href"
+                    },
+                    {
+                      "modelType": "Property",
+                      "semanticId": {
+                        "keys": [
+                          {
+                            "type": "GlobalReference",
+                            "value": "https://www.w3.org/2011/http#methodName"
+                          }
+                        ],
+                        "type": "ExternalReference"
+                      },
+                      "value": "GET",
+                      "valueType": "xs:string",
+                      "idShort": "htv_methodName"
+                    },
+                    {
+                      "modelType": "Property",
+                      "semanticId": {
+                        "keys": [
+                          {
+                            "type": "GlobalReference",
+                            "value": "https://www.w3.org/2019/wot/hypermedia#forContentType"
+                          }
+                        ],
+                        "type": "ExternalReference"
+                      },
+                      "value": "application/json",
+                      "valueType": "xs:string",
+                      "idShort": "contentType"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "modelType": "SubmodelElementCollection",
+          "semanticId": {
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://www.w3.org/2019/wot/td#ActionAffordance"
+              }
+            ],
+            "type": "ExternalReference"
+          },
+          "idShort": "Actions"
+        },
+        {
+          "modelType": "SubmodelElementCollection",
+          "semanticId": {
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://www.w3.org/2019/wot/td#EventAffordance"
+              }
+            ],
+            "type": "ExternalReference"
+          },
+          "idShort": "Events"
+        }
+      ]
+    },
+    {
+      "modelType": "SubmodelElementCollection",
+      "idShort": "externalDescriptor",
+      "value": [
+        {
+          "modelType": "File",
+          "contentType": "application/json",
+          "value": "/aasx/files/counter-http-simple.td.jsonld",
+          "idShort": "ThingDescription"
+        }
+      ]
+    }
+  ]
+}

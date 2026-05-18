@@ -108,7 +108,7 @@ if __name__ == "__main__":
     connections = get_connections(AIMC_url)
 
 
-    import nodered_client as nr
+    import nodered_flowgen as nr
 
     # Create a new flow with default grid settings.
     flow = nr.Flow("Flow 1", columns=[170, 470, 770, 1070, 1270], x_offset=0, y_offset=140, vertical_spacing=80)

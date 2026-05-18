@@ -4,8 +4,6 @@ version = "0.1.0"
 description = "Node-RED Data Mapping Processor"
 requires-python = ">=3.14"
 dependencies = [
-    "aas-python-http-client>=1.0.2",
-    "basyx-python-sdk>=2.0.1",
     "nodered-flowgen",
     "requests>=2.34.2",
 ]

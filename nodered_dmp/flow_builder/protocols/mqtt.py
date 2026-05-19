@@ -3,7 +3,7 @@ import nodered_flowgen as nr
 from nodered_dmp.aas_client import get_InterfaceMetadata
 
 
-def add_nodes(flow, subflow_AASInterface, connection, submodel_server, host, port):
+def add_nodes(flow, subflow_AASInterface, connection, submodel_server, host, port, base_url=None):
     mqtt_broker = nr.MQTTBroker(name="MQTT_Server_1", broker=host, port=port)
     flow.add_node(mqtt_broker)
 

@@ -13,7 +13,7 @@ PROTOCOL_HANDLERS = {
 
 
 def build_flow(connections, submodel_server):
-    flow = nr.Flow("Flow 1", columns=[170, 470, 770, 1070, 1270], x_offset=0, y_offset=140, vertical_spacing=80)
+    flow = nr.Flow("Flow 1", columns=[170, 470, 770, 1070, 1270, 1470, 1670], x_offset=0, y_offset=140, vertical_spacing=80)
 
     subflow_AASInterface = nr.Subflow(name="AASInterface", columns=[120, 320, 520, 770], x_offset=200, y_offset=140)
     get_property = nr.HTTPRequest(name="get property")
@@ -37,9 +37,10 @@ def build_flow(connections, submodel_server):
     flow.add_subflow(subflow_AASInterface)
 
     for connection in connections:
-        schema, host, port = get_host_and_port(get_EndpointMetadata(submodel_server + connection["interface"]))
+        base_url = get_EndpointMetadata(submodel_server + connection["interface"])
+        schema, host, port = get_host_and_port(base_url)
         handler = PROTOCOL_HANDLERS.get(schema)
         if handler:
-            handler(flow, subflow_AASInterface, connection, submodel_server, host, port)
+            handler(flow, subflow_AASInterface, connection, submodel_server, host, port, base_url)
 
     return flow

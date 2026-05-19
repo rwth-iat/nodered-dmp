@@ -38,7 +38,7 @@ def built_flow():
         flow = build_flow(connections, SERVER)
     nodes = json.loads(flow.generate_json())
     ARTIFACTS.mkdir(exist_ok=True)
-    (ARTIFACTS / "flow.json").write_text(json.dumps(nodes, indent=2))
+    (ARTIFACTS / "flow_mqtt.json").write_text(json.dumps(nodes, indent=2))
     return nodes
 
 

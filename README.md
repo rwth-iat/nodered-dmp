@@ -1,6 +1,6 @@
 # nodered-dmp — Node-RED Data Mapping Processor
 
-Automatically generates Node-RED flows from an [Asset Administration Shell (AAS)](https://industrialdigitaltwin.org/en/content-hub/aasspecifications) server. It reads the Asset Interfaces Mapping Configuration (AIMC) submodel and produces a ready-to-import Node-RED flow that routes data between device interfaces (MQTT, HTTP, MODBUS).
+Automatically generates Node-RED flows from an [Asset Administration Shell (AAS)](https://industrialdigitaltwin.org/en/content-hub/aasspecifications) server. It reads the Asset Interfaces Mapping Configuration (AIMC) submodel and produces a ready-to-import Node-RED flow that routes data between device interfaces (MQTT, HTTP, Modbus, OPC UA).
 
 ## How it works
 
@@ -57,12 +57,19 @@ After each test run, the generated flow is saved to `tests/artifacts/flow.json` 
 
 ```
 nodered_dmp/
-├── aas_client.py     # HTTP communication with AAS server
-├── aimc_parser.py    # parses AIMC submodel → structured connections
-└── flow_builder.py   # builds Node-RED flow from parsed connections
-main.py               # entry point
-examples/             # example AAS packages (.aasx)
+├── aas_client.py          # HTTP communication with AAS server
+├── aimc_parser.py         # parses AIMC submodel → structured connections
+└── flow_builder/
+    ├── builder.py         # builds Node-RED flow from parsed connections
+    └── protocols/
+        ├── mqtt.py        # MQTT flow generation
+        ├── http.py        # HTTP flow generation
+        ├── modbus.py      # Modbus flow generation
+        ├── opcua.py       # OPC UA flow generation
+        └── bacnet.py      # BACnet flow generation
+main.py                    # entry point
+examples/                  # example AAS packages (.aasx)
 tests/
-├── fixtures/         # real AAS server responses used as mock data
-└── artifacts/        # generated flow output (gitignored)
+├── fixtures/              # real AAS server responses used as mock data
+└── artifacts/             # generated flow output (gitignored)
 ```

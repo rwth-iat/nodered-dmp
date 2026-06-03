@@ -2,7 +2,8 @@ from nodered_dmp.aas_client import id_to_url
 from nodered_dmp.aimc_parser import get_connections
 from nodered_dmp.flow_builder import build_flow
 
-SUBMODEL_SERVER = "http://localhost:8081"
+# SUBMODEL_SERVER = "http://localhost:8081"
+SUBMODEL_SERVER = "http://localhost:8080/api/v3.1"
 AIMC_ID = "https://www.iat.rwth-aachen.de/pls-lab/pumping_station/TU10/F17/AssetInterfacesMappingConfiguration_v1"
 
 if __name__ == "__main__":

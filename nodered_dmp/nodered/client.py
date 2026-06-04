@@ -1,8 +1,20 @@
+from dataclasses import dataclass
+
 import requests
 
 
 class FlowNotFoundError(Exception):
     pass
+
+
+@dataclass
+class DeployPreview:
+    action: str             # "add" | "replace"
+    flow_name: str
+    new_node_count: int
+    removed_node_count: int # 0 when action == "add"
+    other_tab_count: int
+    other_node_count: int
 
 
 def _headers(token: str | None) -> dict:
@@ -39,6 +51,47 @@ def get_flow_nodes(server_base: str, flow_name: str, token: str | None = None) -
         if not n.get("z") and n.get("type") not in ("tab", "subflow")
     ]
     return [tab] + tab_nodes + config_nodes
+
+
+def preview_deploy(
+    server_base: str,
+    flow_nodes: list[dict],
+    flow_name: str,
+    token: str | None = None,
+) -> DeployPreview:
+    """
+    Return a DeployPreview describing what deploy_flow would do, without deploying.
+    """
+    resp = requests.get(f"{server_base}/flows", headers=_headers(token))
+    resp.raise_for_status()
+    existing: list[dict] = resp.json()
+
+    existing_tab = next(
+        (n for n in existing if n.get("type") == "tab" and n.get("label") == flow_name),
+        None,
+    )
+
+    if existing_tab:
+        old_id = existing_tab["id"]
+        removed = [n for n in existing if n.get("z") == old_id or n.get("id") == old_id]
+        surviving = [n for n in existing if n.get("z") != old_id and n.get("id") != old_id]
+        action = "replace"
+    else:
+        removed = []
+        surviving = existing
+        action = "add"
+
+    other_tabs = [n for n in surviving if n.get("type") == "tab"]
+    other_nodes = [n for n in surviving if n.get("type") != "tab"]
+
+    return DeployPreview(
+        action=action,
+        flow_name=flow_name,
+        new_node_count=len(flow_nodes),
+        removed_node_count=len(removed),
+        other_tab_count=len(other_tabs),
+        other_node_count=len(other_nodes),
+    )
 
 
 def deploy_flow(

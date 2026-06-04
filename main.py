@@ -54,14 +54,29 @@ def cmd_build_flow(args: argparse.Namespace) -> None:
     output.write_text(json.dumps(flow_nodes, indent=2))
     print(f"Flow written to {output}  ({len(etl_paths)} path(s))")
 
-    # Optionally deploy to a live Node-RED instance
+    # Optionally deploy to (or preview against) a live Node-RED instance
     if args.nodered_server:
-        from nodered_dmp.nodered import deploy_flow
+        from nodered_dmp.nodered import deploy_flow, preview_deploy
 
         tab = next(n for n in flow_nodes if n.get("type") == "tab")
         flow_name = tab["label"]
-        deploy_flow(args.nodered_server, flow_nodes, flow_name, token=args.token)
-        print(f"Deployed '{flow_name}' to {args.nodered_server}")
+        preview = preview_deploy(args.nodered_server, flow_nodes, flow_name, token=args.token)
+
+        if preview.action == "replace":
+            print(f"  would replace : '{flow_name}'  "
+                  f"({preview.removed_node_count} old nodes removed, "
+                  f"{preview.new_node_count} new nodes added)")
+        else:
+            print(f"  would add     : '{flow_name}'  "
+                  f"({preview.new_node_count} nodes)")
+        print(f"  untouched     : {preview.other_tab_count} other tab(s), "
+              f"{preview.other_node_count} other node(s)")
+
+        if args.dry_run:
+            print("Dry run — nothing deployed.")
+        else:
+            deploy_flow(args.nodered_server, flow_nodes, flow_name, token=args.token)
+            print(f"Deployed '{flow_name}' to {args.nodered_server}")
 
 
 def cmd_sync_flow(args: argparse.Namespace) -> None:
@@ -153,6 +168,8 @@ def build_parser() -> argparse.ArgumentParser:
                          help="Node-RED server base URL. If given, deploys the flow directly.")
     p_build.add_argument("--token", default=None, metavar="TOKEN",
                          help="Node-RED admin API bearer token (if adminAuth is enabled).")
+    p_build.add_argument("--dry-run", action="store_true",
+                         help="Preview what would be deployed without actually deploying.")
 
     # sync-flow
     p_sync_flow = sub.add_parser(

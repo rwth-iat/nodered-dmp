@@ -2,7 +2,13 @@ from unittest.mock import MagicMock, call, patch
 
 import pytest
 
-from nodered_dmp.nodered.client import FlowNotFoundError, deploy_flow, get_flow_nodes
+from nodered_dmp.nodered.client import (
+    DeployPreview,
+    FlowNotFoundError,
+    deploy_flow,
+    get_flow_nodes,
+    preview_deploy,
+)
 
 SERVER = "http://localhost:1880"
 
@@ -150,3 +156,48 @@ def test_deploy_flow_sends_auth_header():
 
     headers = mock_post.call_args.kwargs["headers"]
     assert headers.get("Authorization") == "Bearer secret"
+
+
+# === preview_deploy ===
+
+def test_preview_deploy_replace_action():
+    with patch("nodered_dmp.nodered.client.requests.get", return_value=_mock_get(ALL_NODES)):
+        preview = preview_deploy(SERVER, NEW_FLOW, "FlowA")
+    assert preview.action == "replace"
+
+
+def test_preview_deploy_add_action():
+    existing = [TAB_B, NODE_B1, BROKER]
+    with patch("nodered_dmp.nodered.client.requests.get", return_value=_mock_get(existing)):
+        preview = preview_deploy(SERVER, NEW_FLOW, "FlowA")
+    assert preview.action == "add"
+
+
+def test_preview_deploy_replace_counts():
+    # ALL_NODES: TAB_A + TAB_B + NODE_A1 + NODE_A2 + NODE_B1 + BROKER
+    # FlowA has tab_a + n1 + n2 → 3 removed; NEW_FLOW has 2 new nodes
+    with patch("nodered_dmp.nodered.client.requests.get", return_value=_mock_get(ALL_NODES)):
+        preview = preview_deploy(SERVER, NEW_FLOW, "FlowA")
+    assert preview.removed_node_count == 3   # TAB_A + NODE_A1 + NODE_A2
+    assert preview.new_node_count == len(NEW_FLOW)
+
+
+def test_preview_deploy_other_tab_count():
+    with patch("nodered_dmp.nodered.client.requests.get", return_value=_mock_get(ALL_NODES)):
+        preview = preview_deploy(SERVER, NEW_FLOW, "FlowA")
+    assert preview.other_tab_count == 1      # TAB_B survives
+    assert preview.other_node_count == 2     # NODE_B1 + BROKER survive
+
+
+def test_preview_deploy_add_zero_removed():
+    existing = [TAB_B, NODE_B1]
+    with patch("nodered_dmp.nodered.client.requests.get", return_value=_mock_get(existing)):
+        preview = preview_deploy(SERVER, NEW_FLOW, "FlowA")
+    assert preview.removed_node_count == 0
+
+
+def test_preview_deploy_does_not_post():
+    with patch("nodered_dmp.nodered.client.requests.get", return_value=_mock_get(ALL_NODES)), \
+         patch("nodered_dmp.nodered.client.requests.post") as mock_post:
+        preview_deploy(SERVER, NEW_FLOW, "FlowA")
+    mock_post.assert_not_called()

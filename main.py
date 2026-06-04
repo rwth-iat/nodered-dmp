@@ -13,7 +13,7 @@ import json
 import sys
 from pathlib import Path
 
-DEFAULT_STORE = "etl_paths.json"
+DEFAULT_STORE = "tmp/etl_paths.json"
 
 
 def cmd_sync_aas(args: argparse.Namespace) -> None:

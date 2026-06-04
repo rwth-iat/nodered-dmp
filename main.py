@@ -151,7 +151,7 @@ def build_parser() -> argparse.ArgumentParser:
         help="Read AIMC submodel from AAS server and reconcile with the store.",
     )
     p_sync_aas.add_argument("--aimc-url", required=True, metavar="URL",
-                            help="Full URL of the AIMC submodel endpoint.")
+                            help="Submodel root URL of the AIMC submodel (e.g. http://host/submodels/<base64id>). Must point to the submodel root, not a specific element.")
     p_sync_aas.add_argument("--server", required=True, metavar="URL",
                             help="AAS server base URL (e.g. http://localhost:8081).")
 

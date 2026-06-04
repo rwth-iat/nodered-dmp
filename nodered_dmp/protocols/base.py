@@ -128,6 +128,7 @@ def parse_chain(
                     f"'{schema.config.node_type}', got '{config_node['type']}'"
                 )
             extracted.update(schema.config.extracts(config_node))
+            extracted["nodered.config_node_id"] = config_id
 
         if slot.extracts:
             extracted.update(slot.extracts(current))

@@ -78,12 +78,6 @@ def _assemble(
     schema: ProtocolSchema,
     anchor_node: dict,
 ) -> ETLPath:
-    config_node_id: str | None = None
-    for slot in schema.chain:
-        if slot.config_ref_field and slot.node_type == anchor_node["type"]:
-            config_node_id = anchor_node.get(slot.config_ref_field)
-            break
-
     return ETLPath(
         extract=ExtractSpec(
             protocol=schema.protocol,
@@ -99,6 +93,6 @@ def _assemble(
         ),
         nodered=NodeRedAnchor(
             endpoint_node_id=anchor_node["id"],
-            config_node_id=config_node_id,
+            config_node_id=extracted.get("nodered.config_node_id"),
         ),
     )

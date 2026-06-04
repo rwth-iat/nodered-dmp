@@ -5,5 +5,13 @@ from nodered_dmp.nodered.client import (
     get_flow_nodes,
     preview_deploy,
 )
+from nodered_dmp.nodered.visual import apply_visual_overrides
 
-__all__ = ["deploy_flow", "DeployPreview", "FlowNotFoundError", "get_flow_nodes", "preview_deploy"]
+__all__ = [
+    "apply_visual_overrides",
+    "deploy_flow",
+    "DeployPreview",
+    "FlowNotFoundError",
+    "get_flow_nodes",
+    "preview_deploy",
+]

@@ -46,8 +46,31 @@ def cmd_build_flow(args: argparse.Namespace) -> None:
         print("No ETLPaths in store. Run sync-aas or sync-flow first.", file=sys.stderr)
         sys.exit(1)
 
+    # Capture old anchors and fetch existing flow before building overwrites nodered anchors
+    old_anchors: dict[str, str] = {}
+    old_flow_nodes: list[dict] | None = None
+    if args.preserve_visual and args.nodered_server:
+        from nodered_dmp.nodered import FlowNotFoundError, get_flow_nodes
+
+        old_anchors = {
+            p.etl_path_id: p.nodered.endpoint_node_id
+            for p in etl_paths if p.nodered
+        }
+        flow_label = args.label or next(
+            (p.aas.aimc_submodel_id for p in etl_paths if p.aas), "Flow 1"
+        )
+        try:
+            old_flow_nodes = get_flow_nodes(args.nodered_server, flow_label, token=args.token)
+        except FlowNotFoundError:
+            pass  # First deploy — nothing to preserve
+
     flow = build_and_store_flow(etl_paths, store, label=args.label or None)
     flow_nodes = json.loads(flow.generate_json())
+
+    if old_flow_nodes and old_anchors:
+        from nodered_dmp.nodered import apply_visual_overrides
+        flow_nodes = apply_visual_overrides(old_flow_nodes, flow_nodes, old_anchors, etl_paths)
+        print("Visual properties preserved from existing flow.")
 
     # Always write to file (default: flow.json)
     output = Path(args.output)
@@ -170,6 +193,10 @@ def build_parser() -> argparse.ArgumentParser:
                          help="Node-RED admin API bearer token (if adminAuth is enabled).")
     p_build.add_argument("--dry-run", action="store_true",
                          help="Preview what would be deployed without actually deploying.")
+    p_build.add_argument("--preserve-visual", action="store_true",
+                         help="(Experimental) Copy node positions, labels, and colours from the "
+                              "existing live flow to the rebuilt nodes before deploying. "
+                              "Requires --nodered-server.")
 
     # sync-flow
     p_sync_flow = sub.add_parser(

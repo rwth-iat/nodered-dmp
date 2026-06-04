@@ -325,7 +325,7 @@ def make_opcua_etl_path(**overrides) -> ETLPath:
 @pytest.fixture
 def built_opcua():
     etl_path = make_opcua_etl_path()
-    flow, subflow = make_flow_and_subflow(extra_columns=1)
+    flow, subflow = make_flow_and_subflow(extra_columns=2)
     build_chain(opcua.SCHEMA, flow, subflow, etl_path)
     nodes = json.loads(flow.generate_json())
     return nodes, etl_path
@@ -344,10 +344,17 @@ def test_build_chain_opcua_creates_item_with_node_id(built_opcua):
     assert item["item"] == "ns=2;s=Device/Pressure"
 
 
-def test_build_chain_opcua_creates_client_in_subscribe_mode(built_opcua):
+def test_build_chain_opcua_creates_inject_node(built_opcua):
+    nodes, _ = built_opcua
+    inject_nodes = [n for n in nodes if n["type"] == "inject"]
+    assert len(inject_nodes) == 1
+    assert inject_nodes[0]["repeat"] == "1"
+
+
+def test_build_chain_opcua_creates_client_in_read_mode(built_opcua):
     nodes, _ = built_opcua
     client = next(n for n in nodes if n["type"] == "OpcUa-Client")
-    assert client["action"] == "subscribe"
+    assert client["action"] == "read"
 
 
 def test_build_chain_opcua_client_references_endpoint(built_opcua):
@@ -375,10 +382,11 @@ def test_build_chain_opcua_populates_nodered_anchor(built_opcua):
 def test_build_chain_opcua_column_positions(built_opcua):
     _, etl_path = built_opcua
     positions = etl_path.nodered.column_positions
-    assert positions["endpoint"] == 0   # OpcUa-Item
-    assert positions["client"] == 1
-    assert positions["transform"] == 3
-    assert positions["sink"] == 5
+    assert positions["trigger"] == 0
+    assert positions["endpoint"] == 1   # OpcUa-Item
+    assert positions["client"] == 2
+    assert positions["transform"] == 4
+    assert positions["sink"] == 6
 
 
 # --- round-trip test (OPC UA) ---
@@ -394,13 +402,14 @@ def test_opcua_round_trip_recovers_etl_fields():
         load=LoadSpec(sink_url="http://aas/submodels/abc/submodel-elements/temperature"),
     )
 
-    flow, subflow = make_flow_and_subflow(extra_columns=1)
+    flow, subflow = make_flow_and_subflow(extra_columns=2)
     build_chain(opcua.SCHEMA, flow, subflow, original)
     nodes = json.loads(flow.generate_json())
     node_map, wire_map = build_maps(nodes)
 
-    start = next(n for n in nodes if n["type"] == "OpcUa-Item")
-    extracted = parse_chain(opcua.SCHEMA, start, node_map, wire_map)
+    # anchor is OpcUa-Item; parse_chain walks back to the Inject (chain start)
+    inject = next(n for n in nodes if n["type"] == "inject")
+    extracted = parse_chain(opcua.SCHEMA, inject, node_map, wire_map)
 
     assert extracted["extract.href"] == original.extract.href
     assert extracted["extract.endpoint"] == original.extract.endpoint

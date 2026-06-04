@@ -31,6 +31,12 @@ SCHEMA = ProtocolSchema(
     ),
     chain=[
         NodeSlot(
+            role="trigger",
+            node_type="inject",
+            builds=lambda etl, _: nr.Inject(repeat="1", once=True),
+            extracts=None,
+        ),
+        NodeSlot(
             role="endpoint",
             node_type="OpcUa-Item",
             builds=lambda etl, cfg: nr.OpcUaItem(item=etl.extract.href),
@@ -41,7 +47,7 @@ SCHEMA = ProtocolSchema(
             node_type="OpcUa-Client",
             builds=lambda etl, cfg: nr.OpcUaClient(
                 endpoint=cfg.id,
-                action="subscribe",
+                action="read",
             ),
             extracts=None,
             config_ref_field="endpoint",

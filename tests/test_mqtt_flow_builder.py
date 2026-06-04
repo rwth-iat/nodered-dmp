@@ -4,26 +4,32 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from nodered_dmp.aimc_parser import get_connections
+from nodered_dmp.aas.aas_to_etlpath import parse_aimc
 from nodered_dmp.flow_builder import build_flow
 
 FIXTURES = Path(__file__).parent / "fixtures"
 ARTIFACTS = Path(__file__).parent / "artifacts"
 SERVER = "http://localhost:8081"
+AIMC_URL = SERVER + "/submodels/abc"
 
-AIMC_FIXTURE = "AssetInterfacesMappingConfiguration.json"
-ENDPOINT_FIXTURES = [
+# Mock call order mirrors parse_aimc traversal:
+#   1. AIMC submodel
+#   2. InterfaceHTTP  (protocol "http" → skipped by _KNOWN_PROTOCOLS)
+#   3. InterfaceMODBUS (protocol "modbus+tcp" → skipped)
+#   4. InterfaceMQTT  (protocol "mqtt" → process)
+#   5. MQTT voltage property
+#   6. MQTT status property
+FIXTURE_SEQUENCE = [
+    "AssetInterfacesMappingConfiguration.json",
     "AssetInterfacesDescription__InterfaceHTTP.json",
     "AssetInterfacesDescription__InterfaceMODBUS.json",
     "AssetInterfacesDescription__InterfaceMQTT.json",
-]
-PROPERTY_FIXTURES = [
     "AssetInterfacesDescription__InterfaceMQTT_InterfaceMetadata_Properties_voltage.json",
     "AssetInterfacesDescription__InterfaceMQTT_InterfaceMetadata_Properties_status.json",
 ]
 
 
-def fixture(name):
+def _mock(name: str) -> Mock:
     m = Mock()
     m.json.return_value = json.loads((FIXTURES / name).read_text())
     return m
@@ -31,11 +37,10 @@ def fixture(name):
 
 @pytest.fixture
 def built_flow():
-    all_fixtures = [AIMC_FIXTURE] + ENDPOINT_FIXTURES + PROPERTY_FIXTURES
-    mocks = [fixture(f) for f in all_fixtures]
-    with patch("nodered_dmp.aas_client.requests.get", side_effect=mocks):
-        connections = get_connections(SERVER + "/submodels/abc")
-        flow = build_flow(connections, SERVER)
+    mocks = [_mock(f) for f in FIXTURE_SEQUENCE]
+    with patch("nodered_dmp.aas.client.requests.get", side_effect=mocks):
+        etl_paths = parse_aimc(AIMC_URL, SERVER)
+    flow = build_flow(etl_paths)
     nodes = json.loads(flow.generate_json())
     ARTIFACTS.mkdir(exist_ok=True)
     (ARTIFACTS / "flow_mqtt.json").write_text(json.dumps(nodes, indent=2))
@@ -74,3 +79,8 @@ def test_flow_builder_aas_interface_subflow_instanced(built_flow):
     instances = [n for n in built_flow if n["type"].startswith("subflow:")]
     assert all(n["type"] == f"subflow:{subflow_def['id']}" for n in instances)
     assert len(instances) == 2
+
+
+def test_flow_tab_label_is_aimc_submodel_id(built_flow):
+    tab = next(n for n in built_flow if n["type"] == "tab")
+    assert "AssetInterfacesMappingConfiguration" in tab["label"]

@@ -1,46 +1,66 @@
 import nodered_flowgen as nr
 
-from nodered_dmp.aas_client import get_EndpointMetadata, get_host_and_port
-from nodered_dmp.flow_builder.protocols import mqtt, http, modbus, opcua, bacnet
+from nodered_dmp.model.etl_path import ETLPath
+from nodered_dmp.protocols.base import build_chain
+from nodered_dmp.protocols.mqtt import SCHEMA as MQTT_SCHEMA
 
-PROTOCOL_HANDLERS = {
-    "mqtt": mqtt.add_nodes,
-    "http": http.add_nodes,
-    "modbus+tcp": modbus.add_nodes,
-    "opc.tcp": opcua.add_nodes,
-    "bacnet": bacnet.add_nodes,
+PROTOCOL_SCHEMAS = {
+    "mqtt": MQTT_SCHEMA,
 }
 
 
-def build_flow(connections, submodel_server):
-    flow = nr.Flow("Flow 1", columns=[170, 470, 770, 1070, 1270, 1470, 1670], x_offset=0, y_offset=140, vertical_spacing=80)
+def build_flow(etl_paths: list[ETLPath]) -> nr.Flow:
+    label = etl_paths[0].aimc_submodel_id if etl_paths else "Flow 1"
+    flow = nr.Flow(
+        label,
+        columns=[170, 470, 770, 1070, 1270, 1470, 1670],
+        x_offset=0,
+        y_offset=140,
+        vertical_spacing=80,
+    )
 
-    subflow_AASInterface = nr.Subflow(name="AASInterface", columns=[120, 320, 520, 770], x_offset=200, y_offset=140)
+    subflow = _build_aas_interface_subflow(flow)
+
+    config_nodes: dict[tuple[str, str], object] = {}
+    for etl_path in etl_paths:
+        schema = PROTOCOL_SCHEMAS.get(etl_path.extract.protocol)
+        if schema is None:
+            continue
+        config_key = (etl_path.extract.protocol, etl_path.extract.endpoint)
+        config_node = config_nodes.get(config_key)
+        if config_node is None and schema.config:
+            config_node = schema.config.builds(etl_path)
+            flow.add_node(config_node)
+            config_nodes[config_key] = config_node
+        build_chain(schema, flow, subflow, etl_path, config_node=config_node)
+
+    return flow
+
+
+def _build_aas_interface_subflow(flow: nr.Flow) -> nr.Subflow:
+    subflow = nr.Subflow(
+        name="AASInterface",
+        columns=[120, 320, 520, 770],
+        x_offset=200,
+        y_offset=140,
+    )
     get_property = nr.HTTPRequest(name="get property")
-    subflow_AASInterface.add_node(get_property, column=0)
+    subflow.add_node(get_property, column=0)
     convert_json = nr.Json()
-    subflow_AASInterface.add_node(convert_json, column=1)
-    change_ValueinJson = nr.Change({
+    subflow.add_node(convert_json, column=1)
+    change_value = nr.Change({
         "t": "move",
         "p": "updateValue",
         "pt": "msg",
         "to": "payload.value",
-        "tot": "msg"
+        "tot": "msg",
     })
-    subflow_AASInterface.add_node(change_ValueinJson, column=2)
+    subflow.add_node(change_value, column=2)
     put_http_request = nr.HTTPRequest(method="PUT", name="write property")
-    subflow_AASInterface.add_node(put_http_request, column=3)
-    subflow_AASInterface.connect_to_input(get_property)
-    subflow_AASInterface.connect_nodes(get_property, convert_json)
-    subflow_AASInterface.connect_nodes(convert_json, change_ValueinJson)
-    subflow_AASInterface.connect_nodes(change_ValueinJson, put_http_request)
-    flow.add_subflow(subflow_AASInterface)
-
-    for connection in connections:
-        base_url = get_EndpointMetadata(submodel_server + connection["interface"])
-        schema, host, port = get_host_and_port(base_url)
-        handler = PROTOCOL_HANDLERS.get(schema)
-        if handler:
-            handler(flow, subflow_AASInterface, connection, submodel_server, host, port, base_url)
-
-    return flow
+    subflow.add_node(put_http_request, column=3)
+    subflow.connect_to_input(get_property)
+    subflow.connect_nodes(get_property, convert_json)
+    subflow.connect_nodes(convert_json, change_value)
+    subflow.connect_nodes(change_value, put_http_request)
+    flow.add_subflow(subflow)
+    return subflow

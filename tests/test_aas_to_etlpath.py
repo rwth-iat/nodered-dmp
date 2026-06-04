@@ -7,6 +7,7 @@ import pytest
 from nodered_dmp.aas.aas_to_etlpath import parse_aimc
 
 FIXTURES = Path(__file__).parent / "fixtures"
+ARTIFACTS = Path(__file__).parent / "artifacts"
 SERVER = "http://localhost:8081"
 AIMC_URL = SERVER + "/submodels/abc"
 
@@ -37,7 +38,12 @@ def _mock(name: str) -> Mock:
 def etl_paths():
     mocks = [_mock(f) for f in FIXTURE_SEQUENCE]
     with patch("nodered_dmp.aas.client.requests.get", side_effect=mocks):
-        return parse_aimc(AIMC_URL, SERVER)
+        paths = parse_aimc(AIMC_URL, SERVER)
+    ARTIFACTS.mkdir(exist_ok=True)
+    (ARTIFACTS / "etl_paths_mqtt.json").write_text(
+        json.dumps([json.loads(p.model_dump_json()) for p in paths], indent=2)
+    )
+    return paths
 
 
 # --- count and protocol ---

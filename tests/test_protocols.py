@@ -6,7 +6,7 @@ import pytest
 
 from nodered_dmp.model.etl_path import ETLPath, ExtractSpec, LoadSpec, TransformSpec
 from nodered_dmp.protocols.base import InvalidETLPathError, build_chain, parse_chain
-from nodered_dmp.protocols import mqtt
+from nodered_dmp.protocols import mqtt, opcua
 
 ARTIFACTS = Path(__file__).parent / "artifacts"
 
@@ -29,10 +29,12 @@ def make_etl_path(**overrides) -> ETLPath:
     return ETLPath(**defaults)
 
 
-def make_flow_and_subflow():
+def make_flow_and_subflow(extra_columns: int = 0):
+    base_columns = [170, 470, 770, 1070, 1270]
+    extra = [base_columns[-1] + 200 * i for i in range(1, extra_columns + 1)]
     flow = nr.Flow(
         "Test Flow",
-        columns=[170, 470, 770, 1070, 1270],
+        columns=base_columns + extra,
         x_offset=0,
         y_offset=140,
         vertical_spacing=80,
@@ -300,6 +302,110 @@ def test_round_trip_multiple_etl_paths():
 
     assert results["/device/voltage"]["load.sink_url"] == etl1.load.sink_url
     assert results["/device/temperature"]["transform.function_code"] == etl2.transform.function_code
+
+
+# --- build_chain tests (OPC UA) ---
+
+def make_opcua_etl_path(**overrides) -> ETLPath:
+    defaults = dict(
+        extract=ExtractSpec(
+            protocol="opcua",
+            endpoint="opc.tcp://localhost:4840",
+            href="ns=2;s=Device/Pressure",
+        ),
+        transform=TransformSpec(),
+        load=LoadSpec(
+            sink_url="http://localhost:8081/submodels/abc/submodel-elements/pressure",
+        ),
+    )
+    defaults.update(overrides)
+    return ETLPath(**defaults)
+
+
+@pytest.fixture
+def built_opcua():
+    etl_path = make_opcua_etl_path()
+    flow, subflow = make_flow_and_subflow(extra_columns=1)
+    build_chain(opcua.SCHEMA, flow, subflow, etl_path)
+    nodes = json.loads(flow.generate_json())
+    return nodes, etl_path
+
+
+def test_build_chain_opcua_creates_endpoint_config(built_opcua):
+    nodes, _ = built_opcua
+    endpoints = [n for n in nodes if n["type"] == "OpcUa-Endpoint"]
+    assert len(endpoints) == 1
+    assert endpoints[0]["endpoint"] == "opc.tcp://localhost:4840"
+
+
+def test_build_chain_opcua_creates_item_with_node_id(built_opcua):
+    nodes, _ = built_opcua
+    item = next(n for n in nodes if n["type"] == "OpcUa-Item")
+    assert item["item"] == "ns=2;s=Device/Pressure"
+
+
+def test_build_chain_opcua_creates_client_in_subscribe_mode(built_opcua):
+    nodes, _ = built_opcua
+    client = next(n for n in nodes if n["type"] == "OpcUa-Client")
+    assert client["action"] == "subscribe"
+
+
+def test_build_chain_opcua_client_references_endpoint(built_opcua):
+    nodes, _ = built_opcua
+    endpoint = next(n for n in nodes if n["type"] == "OpcUa-Endpoint")
+    client = next(n for n in nodes if n["type"] == "OpcUa-Client")
+    assert client["endpoint"] == endpoint["id"]
+
+
+def test_build_chain_opcua_creates_function_node(built_opcua):
+    nodes, _ = built_opcua
+    fn = next(n for n in nodes if n["type"] == "function")
+    assert fn["func"] == "return msg;"
+
+
+def test_build_chain_opcua_populates_nodered_anchor(built_opcua):
+    nodes, etl_path = built_opcua
+    assert etl_path.nodered is not None
+    item = next(n for n in nodes if n["type"] == "OpcUa-Item")
+    endpoint = next(n for n in nodes if n["type"] == "OpcUa-Endpoint")
+    assert etl_path.nodered.endpoint_node_id == item["id"]
+    assert etl_path.nodered.config_node_id == endpoint["id"]
+
+
+def test_build_chain_opcua_column_positions(built_opcua):
+    _, etl_path = built_opcua
+    positions = etl_path.nodered.column_positions
+    assert positions["endpoint"] == 0   # OpcUa-Item
+    assert positions["client"] == 1
+    assert positions["transform"] == 3
+    assert positions["sink"] == 5
+
+
+# --- round-trip test (OPC UA) ---
+
+def test_opcua_round_trip_recovers_etl_fields():
+    original = make_opcua_etl_path(
+        extract=ExtractSpec(
+            protocol="opcua",
+            endpoint="opc.tcp://sensor-gw:4840",
+            href="ns=3;s=Temperature",
+        ),
+        transform=TransformSpec(function_code="msg.payload = msg.payload - 273.15; return msg;"),
+        load=LoadSpec(sink_url="http://aas/submodels/abc/submodel-elements/temperature"),
+    )
+
+    flow, subflow = make_flow_and_subflow(extra_columns=1)
+    build_chain(opcua.SCHEMA, flow, subflow, original)
+    nodes = json.loads(flow.generate_json())
+    node_map, wire_map = build_maps(nodes)
+
+    start = next(n for n in nodes if n["type"] == "OpcUa-Item")
+    extracted = parse_chain(opcua.SCHEMA, start, node_map, wire_map)
+
+    assert extracted["extract.href"] == original.extract.href
+    assert extracted["extract.endpoint"] == original.extract.endpoint
+    assert extracted["transform.function_code"] == original.transform.function_code
+    assert extracted["load.sink_url"] == original.load.sink_url
 
 
 # --- parse_chain error tests ---

@@ -183,3 +183,59 @@ def test_aid_metadata_status_unit_is_none(etl_paths):
 
 def test_nodered_anchor_not_populated(etl_paths):
     assert all(p.nodered is None for p in etl_paths)
+
+
+# ============================================================
+# OPC UA fixture sequence (pumping station TU10/F17)
+# ============================================================
+#
+# parse_aimc fetches:
+#   1. AIMC submodel (1 MappingConfig → InterfaceOPCUA, 1 relation)
+#   2. InterfaceOPCUA (endpoint: opc.tcp://localhost:9409/..., scheme → "opcua")
+#   3. CurrentValue property (href: /?id=ns=2;s=0:F17/PV/PV.CV)
+
+OPCUA_FIXTURE_SEQUENCE = [
+    "AssetInterfacesMappingConfiguration__TU10_F17.json",
+    "AssetInterfacesDescription__TU10_F17__InterfaceOPCUA.json",
+    "AssetInterfacesDescription__TU10_F17__InterfaceOPCUA_properties_CurrentValue.json",
+]
+
+OPCUA_AIMC_URL = SERVER + "/submodels/opcua-aimc"
+
+
+@pytest.fixture
+def opcua_etl_paths():
+    mocks = [_mock(f) for f in OPCUA_FIXTURE_SEQUENCE]
+    with patch("nodered_dmp.aas.client.requests.get", side_effect=mocks):
+        return parse_aimc(OPCUA_AIMC_URL, SERVER)
+
+
+def test_opcua_returns_one_path(opcua_etl_paths):
+    assert len(opcua_etl_paths) == 1
+
+
+def test_opcua_protocol(opcua_etl_paths):
+    assert opcua_etl_paths[0].extract.protocol == "opcua"
+
+
+def test_opcua_endpoint(opcua_etl_paths):
+    assert opcua_etl_paths[0].extract.endpoint == "opc.tcp://localhost:9409/DvOpcUaServer"
+
+
+def test_opcua_href_strips_id_prefix(opcua_etl_paths):
+    # AID href is "/?id=ns=2;s=0:F17/PV/PV.CV" — prefix must be stripped
+    assert opcua_etl_paths[0].extract.href == "ns=2;s=0:F17/PV/PV.CV"
+
+
+def test_opcua_aas_anchor_populated(opcua_etl_paths):
+    p = opcua_etl_paths[0]
+    assert p.aas is not None
+    assert p.aas.aimc_idshort_path == "MappingConfigurations[0].MappingSourceSinkRelations[0]"
+
+
+def test_opcua_aid_metadata_populated(opcua_etl_paths):
+    p = opcua_etl_paths[0]
+    assert p.aid is not None
+    assert p.aid.title == "Current Value"
+    assert p.aid.data_type == "float"
+    assert p.aid.observable is True

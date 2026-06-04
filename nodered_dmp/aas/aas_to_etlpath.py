@@ -11,8 +11,12 @@ from nodered_dmp.model.etl_path import (
     TransformSpec,
 )
 
-# Expand as protocol parsers are implemented in nodered_dmp/protocols/
-_KNOWN_PROTOCOLS = {"mqtt"}
+# Maps AID endpoint URL schemes to ETLPath protocol names.
+# Extend when adding new protocols.
+_SCHEME_TO_PROTOCOL: dict[str, str] = {
+    "mqtt": "mqtt",
+    "opc.tcp": "opcua",
+}
 
 _SEM_INTERFACE_REF = (
     "https://admin-shell.io/idta/AssetInterfacesMappingConfiguration/1/0/InterfaceReference"
@@ -67,8 +71,9 @@ def _process_mapping_config(
     if endpoint_base is None:
         return
 
-    protocol = urlparse(endpoint_base).scheme
-    if protocol not in _KNOWN_PROTOCOLS:
+    scheme = urlparse(endpoint_base).scheme
+    protocol = _SCHEME_TO_PROTOCOL.get(scheme)
+    if protocol is None:
         return
 
     for relation_index, relation in enumerate(relation_elements):
@@ -81,6 +86,7 @@ def _process_mapping_config(
         href, control_packet = _extract_forms(property_json)
         if href is None:
             continue
+        href = _normalize_href(href, protocol)
 
         source_idshort_path = _idshort_path(source_keys)
         sink_submodel_id = sink_keys[0]["value"]
@@ -172,6 +178,13 @@ def _extract_aid_metadata(
         observable=observable,
         value_range=value_range,
     )
+
+
+def _normalize_href(href: str, protocol: str) -> str:
+    """Strip protocol-specific URI prefixes that are part of the AID WoT convention but not the raw identifier."""
+    if protocol == "opcua" and href.startswith("/?id="):
+        return href[5:]
+    return href
 
 
 def _semantic_id_values(element: dict) -> list[str]:

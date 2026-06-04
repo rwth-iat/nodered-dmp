@@ -21,9 +21,9 @@ def cmd_sync_aas(args: argparse.Namespace) -> None:
     from nodered_dmp.model import ETLPathStore
 
     store = ETLPathStore(args.store)
-    result = sync_aas(args.aimc_url, args.server, store)
+    result = sync_aas(args.aimc_url, args.server, store, dry_run=args.dry_run)
 
-    print("sync-aas complete")
+    print("sync-aas" + (" (dry run — store not modified)" if args.dry_run else "") + " complete")
     print(f"  created : {len(result.created)}")
     print(f"  updated : {len(result.updated)}")
     print(f"  deleted : {len(result.deleted)}")
@@ -123,9 +123,9 @@ def cmd_sync_flow(args: argparse.Namespace) -> None:
         sys.exit(1)
 
     store = ETLPathStore(args.store)
-    result = sync_flow(nodes, store)
+    result = sync_flow(nodes, store, dry_run=args.dry_run)
 
-    print("sync-flow complete")
+    print("sync-flow" + (" (dry run — store not modified)" if args.dry_run else "") + " complete")
     print(f"  created : {len(result.created)}")
     print(f"  updated : {len(result.updated)}")
     print(f"  deleted : {len(result.deleted)}")
@@ -177,6 +177,8 @@ def build_parser() -> argparse.ArgumentParser:
                             help="Submodel root URL of the AIMC submodel (e.g. http://host/submodels/<base64id>). Must point to the submodel root, not a specific element.")
     p_sync_aas.add_argument("--server", required=True, metavar="URL",
                             help="AAS server base URL (e.g. http://localhost:8081).")
+    p_sync_aas.add_argument("--dry-run", action="store_true",
+                            help="Show what would change without modifying the store.")
 
     # build-flow
     p_build = sub.add_parser(
@@ -211,6 +213,8 @@ def build_parser() -> argparse.ArgumentParser:
                              help="Flow tab name to fetch (required with --nodered-server).")
     p_sync_flow.add_argument("--token", default=None, metavar="TOKEN",
                              help="Node-RED admin API bearer token (if adminAuth is enabled).")
+    p_sync_flow.add_argument("--dry-run", action="store_true",
+                             help="Show what would change without modifying the store.")
 
     # write-aas
     p_write = sub.add_parser(

@@ -12,7 +12,12 @@ class SyncResult:
     deleted: list[ETLPath]
 
 
-def sync_aas(aimc_url: str, server_base: str, store: ETLPathStore) -> SyncResult:
+def sync_aas(
+    aimc_url: str,
+    server_base: str,
+    store: ETLPathStore,
+    dry_run: bool = False,
+) -> SyncResult:
     """
     Parse an AIMC submodel and reconcile the results against the store.
 
@@ -20,7 +25,9 @@ def sync_aas(aimc_url: str, server_base: str, store: ETLPathStore) -> SyncResult
     - No match → new ETLPath, saved with a fresh UUID.
     - Stored paths from the same aimc_submodel_id absent from the parsed results → deleted.
 
-    Returns a SyncResult describing what changed. The store is updated in place.
+    When dry_run=True the diff is computed and returned but the store is not modified.
+
+    Returns a SyncResult describing what changed.
     """
     parsed = parse_aimc(aimc_url, server_base)
     if not parsed:
@@ -38,15 +45,19 @@ def sync_aas(aimc_url: str, server_base: str, store: ETLPathStore) -> SyncResult
         )
         if existing:
             before = existing.model_copy(deep=True)
-            existing.extract = parsed_path.extract
-            existing.transform = parsed_path.transform
-            existing.load = parsed_path.load
-            existing.aas = parsed_path.aas
-            existing.aid = parsed_path.aid
-            store.save(existing)
-            updated.append((before, existing))
+            after = existing.model_copy(deep=True)
+            after.extract = parsed_path.extract
+            after.transform = parsed_path.transform
+            after.load = parsed_path.load
+            after.aas = parsed_path.aas
+            after.aid = parsed_path.aid
+            if before != after:
+                if not dry_run:
+                    store.save(after)
+                updated.append((before, after))
         else:
-            store.save(parsed_path)
+            if not dry_run:
+                store.save(parsed_path)
             created.append(parsed_path)
 
     deleted: list[ETLPath] = []
@@ -56,7 +67,8 @@ def sync_aas(aimc_url: str, server_base: str, store: ETLPathStore) -> SyncResult
             and stored.aas.aimc_submodel_id == aimc_submodel_id
             and stored.aas.aimc_idshort_path not in parsed_by_aimc_path
         ):
-            store.delete(stored.etl_path_id)
+            if not dry_run:
+                store.delete(stored.etl_path_id)
             deleted.append(stored)
 
     return SyncResult(created=created, updated=updated, deleted=deleted)

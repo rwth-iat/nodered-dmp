@@ -62,14 +62,20 @@ def test_sync_flow_second_run_updates_not_creates(store, flow_nodes):
     sync_flow(flow_nodes, store)
     result = sync_flow(flow_nodes, store)
     assert result.created == []
-    assert len(result.updated) == 2
+    assert result.updated == []  # identical data — no actual change
     assert result.deleted == []
 
 
 def test_sync_flow_update_preserves_uuid(store, flow_nodes):
     first = sync_flow(flow_nodes, store)
     first_ids = {p.etl_path_id for p in first.created}
-    second = sync_flow(flow_nodes, store)
+
+    # Modify function code so the second run produces a genuine update
+    modified = json.loads(json.dumps(flow_nodes))
+    for node in modified:
+        if node["type"] == "function":
+            node["func"] = "msg.payload = 99; return msg;"
+    second = sync_flow(modified, store)
     second_ids = {after.etl_path_id for _, after in second.updated}
     assert first_ids == second_ids
 
@@ -151,7 +157,7 @@ def test_sync_aas_second_run_updates_not_creates(store):
         with patch("nodered_dmp.aas.client.requests.get", side_effect=mocks):
             result = sync_aas(AIMC_URL, SERVER, store)
     assert result.created == []
-    assert len(result.updated) == 2
+    assert result.updated == []  # identical data — no actual change
 
 
 def test_sync_aas_update_preserves_uuid(store):
@@ -160,7 +166,14 @@ def test_sync_aas_update_preserves_uuid(store):
         first = sync_aas(AIMC_URL, SERVER, store)
     first_ids = {p.etl_path_id for p in first.created}
 
-    mocks = [_mock(f) for f in FIXTURE_SEQUENCE]
+    # Use a modified fixture sequence that changes the endpoint so a genuine update fires
+    def _modified_mock(name: str) -> Mock:
+        raw = (FIXTURES / name).read_text().replace("mqtt://", "mqtt://modified-")
+        m = Mock()
+        m.json.return_value = json.loads(raw)
+        return m
+
+    mocks = [_modified_mock(f) for f in FIXTURE_SEQUENCE]
     with patch("nodered_dmp.aas.client.requests.get", side_effect=mocks):
         second = sync_aas(AIMC_URL, SERVER, store)
     second_ids = {after.etl_path_id for _, after in second.updated}

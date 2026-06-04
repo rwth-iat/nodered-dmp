@@ -13,7 +13,11 @@ class SyncResult:
     deleted: list[ETLPath]
 
 
-def sync_flow(nodes: list[dict[str, Any]], store: ETLPathStore) -> SyncResult:
+def sync_flow(
+    nodes: list[dict[str, Any]],
+    store: ETLPathStore,
+    dry_run: bool = False,
+) -> SyncResult:
     """
     Parse a Node-RED flow and reconcile the results against the store.
 
@@ -21,7 +25,9 @@ def sync_flow(nodes: list[dict[str, Any]], store: ETLPathStore) -> SyncResult:
     - No match → new ETLPath, saved with a fresh UUID.
     - Stored paths whose endpoint_node_id is absent from the parsed results → deleted.
 
-    Returns a SyncResult describing what changed. The store is updated in place.
+    When dry_run=True the diff is computed and returned but the store is not modified.
+
+    Returns a SyncResult describing what changed.
     """
     parsed = parse_flow(nodes)
     parsed_by_node_id = {
@@ -37,20 +43,25 @@ def sync_flow(nodes: list[dict[str, Any]], store: ETLPathStore) -> SyncResult:
         existing = store.find_by_node_id(parsed_path.nodered.endpoint_node_id)
         if existing:
             before = existing.model_copy(deep=True)
-            existing.extract = parsed_path.extract
-            existing.transform = parsed_path.transform
-            existing.load = parsed_path.load
-            existing.nodered = parsed_path.nodered
-            store.save(existing)
-            updated.append((before, existing))
+            after = existing.model_copy(deep=True)
+            after.extract = parsed_path.extract
+            after.transform = parsed_path.transform
+            after.load = parsed_path.load
+            after.nodered = parsed_path.nodered
+            if before != after:
+                if not dry_run:
+                    store.save(after)
+                updated.append((before, after))
         else:
-            store.save(parsed_path)
+            if not dry_run:
+                store.save(parsed_path)
             created.append(parsed_path)
 
     deleted: list[ETLPath] = []
     for stored in store.load_all():
         if stored.nodered and stored.nodered.endpoint_node_id not in parsed_by_node_id:
-            store.delete(stored.etl_path_id)
+            if not dry_run:
+                store.delete(stored.etl_path_id)
             deleted.append(stored)
 
     return SyncResult(created=created, updated=updated, deleted=deleted)

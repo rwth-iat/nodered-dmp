@@ -3,8 +3,8 @@ nodered-dmp CLI
 
 Subcommands:
   sync-aas    Read an AIMC submodel from an AAS server and reconcile with the store.
-  build-flow  Build a Node-RED flow JSON from the store and write it to a file.
-  sync-flow   Parse a Node-RED flow JSON file and reconcile with the store.
+  build-flow  Build a Node-RED flow JSON from the store; optionally deploy to Node-RED.
+  sync-flow   Parse a Node-RED flow (file or live server) and reconcile with the store.
   write-aas   Write ETLPaths from the store back to the AAS server.
 """
 
@@ -23,20 +23,16 @@ def cmd_sync_aas(args: argparse.Namespace) -> None:
     store = ETLPathStore(args.store)
     result = sync_aas(args.aimc_url, args.server, store)
 
-    print(f"sync-aas complete")
+    print("sync-aas complete")
     print(f"  created : {len(result.created)}")
     print(f"  updated : {len(result.updated)}")
     print(f"  deleted : {len(result.deleted)}")
-
-    if result.created:
-        for p in result.created:
-            print(f"    + {p.extract.protocol} {p.extract.href}")
-    if result.updated:
-        for before, after in result.updated:
-            print(f"    ~ {after.extract.protocol} {after.extract.href}")
-    if result.deleted:
-        for p in result.deleted:
-            print(f"    - {p.extract.protocol} {p.extract.href}")
+    for p in result.created:
+        print(f"    + {p.extract.protocol} {p.extract.href}")
+    for _, after in result.updated:
+        print(f"    ~ {after.extract.protocol} {after.extract.href}")
+    for p in result.deleted:
+        print(f"    - {p.extract.protocol} {p.extract.href}")
 
 
 def cmd_build_flow(args: argparse.Namespace) -> None:
@@ -51,38 +47,56 @@ def cmd_build_flow(args: argparse.Namespace) -> None:
         sys.exit(1)
 
     flow = build_and_store_flow(etl_paths, store, label=args.label or None)
+    flow_nodes = json.loads(flow.generate_json())
+
+    # Always write to file (default: flow.json)
     output = Path(args.output)
-    output.write_text(flow.generate_json())
+    output.write_text(json.dumps(flow_nodes, indent=2))
     print(f"Flow written to {output}  ({len(etl_paths)} path(s))")
+
+    # Optionally deploy to a live Node-RED instance
+    if args.nodered_server:
+        from nodered_dmp.nodered import deploy_flow
+
+        tab = next(n for n in flow_nodes if n.get("type") == "tab")
+        flow_name = tab["label"]
+        deploy_flow(args.nodered_server, flow_nodes, flow_name, token=args.token)
+        print(f"Deployed '{flow_name}' to {args.nodered_server}")
 
 
 def cmd_sync_flow(args: argparse.Namespace) -> None:
     from nodered_dmp.model import ETLPathStore
     from nodered_dmp.parse import sync_flow
 
-    flow_file = Path(args.flow)
-    if not flow_file.exists():
-        print(f"Flow file not found: {flow_file}", file=sys.stderr)
+    if args.nodered_server:
+        from nodered_dmp.nodered import get_flow_nodes
+        if not args.flow_name:
+            print("--flow-name is required when using --nodered-server.", file=sys.stderr)
+            sys.exit(1)
+        nodes = get_flow_nodes(args.nodered_server, args.flow_name, token=args.token)
+    elif args.flow:
+        flow_file = Path(args.flow)
+        if not flow_file.exists():
+            print(f"Flow file not found: {flow_file}", file=sys.stderr)
+            sys.exit(1)
+        nodes = json.loads(flow_file.read_text())
+    else:
+        print("Provide either --flow FILE or --nodered-server URL --flow-name NAME.", file=sys.stderr)
         sys.exit(1)
 
-    nodes = json.loads(flow_file.read_text())
     store = ETLPathStore(args.store)
     result = sync_flow(nodes, store)
 
-    print(f"sync-flow complete")
+    print("sync-flow complete")
     print(f"  created : {len(result.created)}")
     print(f"  updated : {len(result.updated)}")
     print(f"  deleted : {len(result.deleted)}")
-
-    if result.created:
-        for p in result.created:
-            print(f"    + {p.extract.protocol} {p.extract.href}")
-    if result.updated:
-        for before, after in result.updated:
-            print(f"    ~ {after.extract.protocol} {after.extract.href}")
-    if result.deleted:
-        for p in result.deleted:
-            print(f"    - {p.extract.protocol} {p.extract.href}")
+    for p in result.created:
+        print(f"    + {p.extract.protocol} {p.extract.href}")
+    for _, after in result.updated:
+        print(f"    ~ {after.extract.protocol} {after.extract.href}")
+    for p in result.deleted:
+        print(f"    - {p.extract.protocol} {p.extract.href}")
 
 
 def cmd_write_aas(args: argparse.Namespace) -> None:
@@ -135,14 +149,24 @@ def build_parser() -> argparse.ArgumentParser:
                          help="Output file for the flow JSON (default: flow.json).")
     p_build.add_argument("--label", default=None, metavar="LABEL",
                          help="Flow tab label. Defaults to the AIMC submodel ID.")
+    p_build.add_argument("--nodered-server", default=None, metavar="URL",
+                         help="Node-RED server base URL. If given, deploys the flow directly.")
+    p_build.add_argument("--token", default=None, metavar="TOKEN",
+                         help="Node-RED admin API bearer token (if adminAuth is enabled).")
 
     # sync-flow
     p_sync_flow = sub.add_parser(
         "sync-flow",
-        help="Parse a Node-RED flow JSON file and reconcile with the store.",
+        help="Parse a Node-RED flow and reconcile with the store.",
     )
-    p_sync_flow.add_argument("--flow", required=True, metavar="FILE",
-                             help="Path to the Node-RED flow JSON file.")
+    p_sync_flow.add_argument("--flow", default=None, metavar="FILE",
+                             help="Path to a Node-RED flow JSON file.")
+    p_sync_flow.add_argument("--nodered-server", default=None, metavar="URL",
+                             help="Node-RED server base URL (alternative to --flow).")
+    p_sync_flow.add_argument("--flow-name", default=None, metavar="NAME",
+                             help="Flow tab name to fetch (required with --nodered-server).")
+    p_sync_flow.add_argument("--token", default=None, metavar="TOKEN",
+                             help="Node-RED admin API bearer token (if adminAuth is enabled).")
 
     # write-aas
     p_write = sub.add_parser(
@@ -165,6 +189,4 @@ _COMMANDS = {
 if __name__ == "__main__":
     parser = build_parser()
     args = parser.parse_args()
-
-    # --store applies to all subcommands; attach it to args so each handler can read it
     _COMMANDS[args.command](args)

@@ -90,10 +90,10 @@ def _mock_deploy():
 def test_deploy_flow_replaces_existing_tab():
     get_resp, put_resp = _mock_deploy()
     with patch("nodered_dmp.nodered.client.requests.get", return_value=get_resp), \
-         patch("nodered_dmp.nodered.client.requests.put", return_value=put_resp) as mock_put:
+         patch("nodered_dmp.nodered.client.requests.post", return_value=put_resp) as mock_post:
         deploy_flow(SERVER, NEW_FLOW, "FlowA")
 
-    sent = mock_put.call_args.kwargs["json"]
+    sent = mock_post.call_args.kwargs["json"]
     sent_ids = {n["id"] for n in sent}
     # old FlowA nodes gone
     assert "tab_a" not in sent_ids
@@ -107,10 +107,10 @@ def test_deploy_flow_replaces_existing_tab():
 def test_deploy_flow_preserves_other_tab():
     get_resp, put_resp = _mock_deploy()
     with patch("nodered_dmp.nodered.client.requests.get", return_value=get_resp), \
-         patch("nodered_dmp.nodered.client.requests.put", return_value=put_resp) as mock_put:
+         patch("nodered_dmp.nodered.client.requests.post", return_value=put_resp) as mock_post:
         deploy_flow(SERVER, NEW_FLOW, "FlowA")
 
-    sent = mock_put.call_args.kwargs["json"]
+    sent = mock_post.call_args.kwargs["json"]
     sent_ids = {n["id"] for n in sent}
     assert "tab_b" in sent_ids
     assert "n3" in sent_ids
@@ -122,10 +122,10 @@ def test_deploy_flow_adds_new_tab_if_not_found():
     get_resp = _mock_get(existing)
     put_resp = MagicMock()
     with patch("nodered_dmp.nodered.client.requests.get", return_value=get_resp), \
-         patch("nodered_dmp.nodered.client.requests.put", return_value=put_resp) as mock_put:
+         patch("nodered_dmp.nodered.client.requests.post", return_value=put_resp) as mock_post:
         deploy_flow(SERVER, NEW_FLOW, "FlowA")
 
-    sent = mock_put.call_args.kwargs["json"]
+    sent = mock_post.call_args.kwargs["json"]
     sent_ids = {n["id"] for n in sent}
     assert "tab_b" in sent_ids
     assert "new_tab" in sent_ids
@@ -135,18 +135,18 @@ def test_deploy_flow_adds_new_tab_if_not_found():
 def test_deploy_flow_sends_deployment_type_header():
     get_resp, put_resp = _mock_deploy()
     with patch("nodered_dmp.nodered.client.requests.get", return_value=get_resp), \
-         patch("nodered_dmp.nodered.client.requests.put", return_value=put_resp) as mock_put:
+         patch("nodered_dmp.nodered.client.requests.post", return_value=put_resp) as mock_post:
         deploy_flow(SERVER, NEW_FLOW, "FlowA")
 
-    headers = mock_put.call_args.kwargs["headers"]
+    headers = mock_post.call_args.kwargs["headers"]
     assert headers.get("Node-RED-Deployment-Type") == "full"
 
 
 def test_deploy_flow_sends_auth_header():
     get_resp, put_resp = _mock_deploy()
     with patch("nodered_dmp.nodered.client.requests.get", return_value=get_resp), \
-         patch("nodered_dmp.nodered.client.requests.put", return_value=put_resp) as mock_put:
+         patch("nodered_dmp.nodered.client.requests.post", return_value=put_resp) as mock_post:
         deploy_flow(SERVER, NEW_FLOW, "FlowA", token="secret")
 
-    headers = mock_put.call_args.kwargs["headers"]
+    headers = mock_post.call_args.kwargs["headers"]
     assert headers.get("Authorization") == "Bearer secret"

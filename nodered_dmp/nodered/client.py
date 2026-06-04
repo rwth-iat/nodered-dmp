@@ -68,7 +68,7 @@ def deploy_flow(
 
     merged = existing + flow_nodes
 
-    resp = requests.put(
+    resp = requests.post(
         f"{server_base}/flows",
         json=merged,
         headers={**_headers(token), "Node-RED-Deployment-Type": "full"},

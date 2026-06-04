@@ -160,8 +160,8 @@ def build_parser() -> argparse.ArgumentParser:
         "build-flow",
         help="Build a Node-RED flow JSON from the store.",
     )
-    p_build.add_argument("--output", default="flow.json", metavar="FILE",
-                         help="Output file for the flow JSON (default: flow.json).")
+    p_build.add_argument("--output", default="tmp/flow.json", metavar="FILE",
+                         help="Output file for the flow JSON (default: tmp/flow.json).")
     p_build.add_argument("--label", default=None, metavar="LABEL",
                          help="Flow tab label. Defaults to the AIMC submodel ID.")
     p_build.add_argument("--nodered-server", default=None, metavar="URL",

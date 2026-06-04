@@ -15,8 +15,6 @@ ARTIFACTS = Path(__file__).parent / "artifacts"
 
 def make_etl_path(**overrides) -> ETLPath:
     defaults = dict(
-        aimc_submodel_id="https://example.com/aimc/1",
-        aimc_idshort_path="MappingMQTT.Relations.voltage",
         extract=ExtractSpec(
             protocol="mqtt",
             endpoint="mqtt://localhost:1883",

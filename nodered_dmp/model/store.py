@@ -21,8 +21,11 @@ class ETLPathStore:
 
     def find_by_aimc_path(self, aimc_submodel_id: str, aimc_idshort_path: str) -> ETLPath | None:
         doc = self.db.get(
-            (where("aimc_submodel_id") == aimc_submodel_id) &
-            (where("aimc_idshort_path") == aimc_idshort_path)
+            where("aas").test(
+                lambda v: v is not None
+                and v.get("aimc_submodel_id") == aimc_submodel_id
+                and v.get("aimc_idshort_path") == aimc_idshort_path
+            )
         )
         return ETLPath.model_validate(doc) if doc else None
 

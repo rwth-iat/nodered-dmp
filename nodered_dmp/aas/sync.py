@@ -26,15 +26,15 @@ def sync_aas(aimc_url: str, server_base: str, store: ETLPathStore) -> SyncResult
     if not parsed:
         return SyncResult(created=[], updated=[], deleted=[])
 
-    aimc_submodel_id = parsed[0].aimc_submodel_id
-    parsed_by_aimc_path = {p.aimc_idshort_path: p for p in parsed}
+    aimc_submodel_id = parsed[0].aas.aimc_submodel_id
+    parsed_by_aimc_path = {p.aas.aimc_idshort_path: p for p in parsed}
 
     created: list[ETLPath] = []
     updated: list[tuple[ETLPath, ETLPath]] = []
 
     for parsed_path in parsed:
         existing = store.find_by_aimc_path(
-            parsed_path.aimc_submodel_id, parsed_path.aimc_idshort_path
+            parsed_path.aas.aimc_submodel_id, parsed_path.aas.aimc_idshort_path
         )
         if existing:
             before = existing.model_copy(deep=True)
@@ -42,6 +42,7 @@ def sync_aas(aimc_url: str, server_base: str, store: ETLPathStore) -> SyncResult
             existing.transform = parsed_path.transform
             existing.load = parsed_path.load
             existing.aas = parsed_path.aas
+            existing.aid = parsed_path.aid
             store.save(existing)
             updated.append((before, existing))
         else:
@@ -51,8 +52,9 @@ def sync_aas(aimc_url: str, server_base: str, store: ETLPathStore) -> SyncResult
     deleted: list[ETLPath] = []
     for stored in store.load_all():
         if (
-            stored.aimc_submodel_id == aimc_submodel_id
-            and stored.aimc_idshort_path not in parsed_by_aimc_path
+            stored.aas
+            and stored.aas.aimc_submodel_id == aimc_submodel_id
+            and stored.aas.aimc_idshort_path not in parsed_by_aimc_path
         ):
             store.delete(stored.etl_path_id)
             deleted.append(stored)

@@ -20,3 +20,13 @@ def get_submodel_json(url: str) -> dict:
 
 def get_submodel_element_json(url: str) -> dict:
     return requests.get(url).json()
+
+
+def put_submodel(base_url: str, submodel_id: str, body: dict) -> None:
+    b64 = base64.b64encode(submodel_id.encode()).decode()
+    requests.put(f"{base_url}/submodels/{b64}", json=body)
+
+
+def put_submodel_element(base_url: str, submodel_id: str, idshort_path: str, body: dict) -> None:
+    b64 = base64.b64encode(submodel_id.encode()).decode()
+    requests.put(f"{base_url}/submodels/{b64}/submodel-elements/{idshort_path}", json=body)

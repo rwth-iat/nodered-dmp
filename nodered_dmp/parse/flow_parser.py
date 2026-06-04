@@ -85,8 +85,6 @@ def _assemble(
             break
 
     return ETLPath(
-        aimc_submodel_id="",
-        aimc_idshort_path="",
         extract=ExtractSpec(
             protocol=schema.protocol,
             endpoint=extracted.get("extract.endpoint", ""),

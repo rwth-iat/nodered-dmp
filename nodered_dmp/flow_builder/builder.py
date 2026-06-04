@@ -6,8 +6,9 @@ from nodered_dmp.protocols.base import build_chain
 from nodered_dmp.protocols.schemas import PROTOCOL_SCHEMAS
 
 
-def build_flow(etl_paths: list[ETLPath]) -> nr.Flow:
-    label = etl_paths[0].aimc_submodel_id if etl_paths else "Flow 1"
+def build_flow(etl_paths: list[ETLPath], label: str | None = None) -> nr.Flow:
+    if label is None:
+        label = next((p.aas.aimc_submodel_id for p in etl_paths if p.aas), "Flow 1")
     flow = nr.Flow(
         label,
         columns=[170, 470, 770, 1070, 1270, 1470, 1670],
@@ -34,14 +35,14 @@ def build_flow(etl_paths: list[ETLPath]) -> nr.Flow:
     return flow
 
 
-def build_and_store_flow(etl_paths: list[ETLPath], store: ETLPathStore) -> nr.Flow:
+def build_and_store_flow(etl_paths: list[ETLPath], store: ETLPathStore, label: str | None = None) -> nr.Flow:
     """
     Build a Node-RED flow and persist the updated ETLPaths (with nodered anchors) to the store.
 
     build_flow populates etl_path.nodered in memory but does not save. This function
     ensures the store reflects the populated anchors immediately after building.
     """
-    flow = build_flow(etl_paths)
+    flow = build_flow(etl_paths, label=label)
     for etl_path in etl_paths:
         store.save(etl_path)
     return flow

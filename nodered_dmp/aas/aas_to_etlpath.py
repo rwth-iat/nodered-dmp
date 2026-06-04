@@ -4,6 +4,7 @@ from urllib.parse import urlparse
 from nodered_dmp.aas.client import get_submodel_element_json, get_submodel_json
 from nodered_dmp.model.etl_path import (
     AASAnchor,
+    AIDMetadata,
     ETLPath,
     ExtractSpec,
     LoadSpec,
@@ -33,9 +34,9 @@ def parse_aimc(aimc_url: str, server_base: str) -> list[ETLPath]:
     etl_paths: list[ETLPath] = []
 
     for top_element in aimc_json["submodelElements"]:
-        for mapping_config in top_element.get("value", []):
+        for config_index, mapping_config in enumerate(top_element.get("value", [])):
             _process_mapping_config(
-                mapping_config, aimc_submodel_id, server_base, etl_paths
+                config_index, mapping_config, aimc_submodel_id, server_base, etl_paths
             )
 
     return etl_paths
@@ -44,7 +45,7 @@ def parse_aimc(aimc_url: str, server_base: str) -> list[ETLPath]:
 # --- private helpers ---
 
 def _process_mapping_config(
-    config: dict, aimc_submodel_id: str, server_base: str, out: list[ETLPath]
+    config_index: int, config: dict, aimc_submodel_id: str, server_base: str, out: list[ETLPath]
 ) -> None:
     interface_keys = None
     relation_elements = []
@@ -70,7 +71,7 @@ def _process_mapping_config(
     if protocol not in _KNOWN_PROTOCOLS:
         return
 
-    for relation in relation_elements:
+    for relation_index, relation in enumerate(relation_elements):
         source_keys = relation["first"]["keys"]
         sink_keys = relation["second"]["keys"]
 
@@ -85,10 +86,9 @@ def _process_mapping_config(
         sink_submodel_id = sink_keys[0]["value"]
         sink_idshort_path = _idshort_path(sink_keys)
         sink_url = _keys_to_url(server_base, sink_keys)
+        aimc_idshort_path = f"MappingConfigurations[{config_index}].MappingSourceSinkRelations[{relation_index}]"
 
         out.append(ETLPath(
-            aimc_submodel_id=aimc_submodel_id,
-            aimc_idshort_path=source_idshort_path,
             extract=ExtractSpec(
                 protocol=protocol,
                 endpoint=endpoint_base,
@@ -101,7 +101,11 @@ def _process_mapping_config(
                 submodel_id=sink_submodel_id,
                 idshort_path=sink_idshort_path,
             ),
-            aas=_extract_aas_anchor(property_json, aid_submodel_id, source_idshort_path),
+            aas=AASAnchor(
+                aimc_submodel_id=aimc_submodel_id,
+                aimc_idshort_path=aimc_idshort_path,
+            ),
+            aid=_extract_aid_metadata(property_json, aid_submodel_id, source_idshort_path),
         ))
 
 
@@ -139,9 +143,9 @@ def _extract_forms(property_json: dict) -> tuple[str | None, str | None]:
     return None, None
 
 
-def _extract_aas_anchor(
+def _extract_aid_metadata(
     property_json: dict, aid_submodel_id: str, idshort_path: str
-) -> AASAnchor:
+) -> AIDMetadata:
     by_idshort = {e.get("idShort"): e for e in property_json.get("value", [])}
 
     title = by_idshort.get("title", {}).get("value")
@@ -159,7 +163,7 @@ def _extract_aas_anchor(
     if range_elem and range_elem.get("min") and range_elem.get("max"):
         value_range = (range_elem["min"], range_elem["max"])
 
-    return AASAnchor(
+    return AIDMetadata(
         aid_submodel_id=aid_submodel_id,
         aid_idshort_path=idshort_path,
         title=title,

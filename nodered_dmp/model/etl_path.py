@@ -27,8 +27,13 @@ class NodeRedAnchor(BaseModel):
 
 
 class AASAnchor(BaseModel):
+    aimc_submodel_id: str       # AIMC submodel ID (URI)
+    aimc_idshort_path: str      # indexed path to the RelationshipElement, e.g. "MappingConfigurations[2].MappingSourceSinkRelations[0]"
+
+
+class AIDMetadata(BaseModel):
     aid_submodel_id: str        # AID submodel ID (URI)
-    aid_idshort_path: str       # idShort path to the property within AID
+    aid_idshort_path: str       # idShort path to the property within AID (e.g. "InterfaceMQTT.InterfaceMetadata.Properties.voltage")
     title: str | None = None
     data_type: str | None = None
     unit: str | None = None
@@ -38,12 +43,11 @@ class AASAnchor(BaseModel):
 
 class ETLPath(BaseModel):
     etl_path_id: str = Field(default_factory=lambda: uuid4().hex)
-    aimc_submodel_id: str       # AIMC submodel ID → used as Node-RED flow tab label
-    aimc_idshort_path: str      # idShort path to the source/sink relation in AIMC
 
     extract: ExtractSpec
     transform: TransformSpec
     load: LoadSpec
 
-    nodered: NodeRedAnchor | None = None    # populated by flow_builder
-    aas: AASAnchor | None = None            # populated by aas_to_etlpath
+    nodered: NodeRedAnchor | None = None    # populated by flow_builder or parse/
+    aas: AASAnchor | None = None            # AIMC anchor, populated by aas_to_etlpath
+    aid: AIDMetadata | None = None          # AID property metadata, populated by aas_to_etlpath

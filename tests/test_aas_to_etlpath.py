@@ -56,22 +56,23 @@ def test_all_paths_have_mqtt_protocol(etl_paths):
     assert all(p.extract.protocol == "mqtt" for p in etl_paths)
 
 
-# --- AIMC identity ---
+# --- AIMC identity (AASAnchor) ---
 
-def test_aimc_submodel_id(etl_paths):
+def test_aas_anchor_aimc_submodel_id(etl_paths):
     expected = "https://example.com/ids/sm/AssetInterfacesMappingConfiguration"
-    assert all(p.aimc_submodel_id == expected for p in etl_paths)
+    assert all(p.aas.aimc_submodel_id == expected for p in etl_paths)
 
 
-def test_aimc_idshort_paths_are_unique(etl_paths):
-    paths = [p.aimc_idshort_path for p in etl_paths]
+def test_aas_anchor_aimc_idshort_paths_are_unique(etl_paths):
+    paths = [p.aas.aimc_idshort_path for p in etl_paths]
     assert len(set(paths)) == 2
 
 
-def test_aimc_idshort_path_contains_property_name(etl_paths):
-    paths = [p.aimc_idshort_path for p in etl_paths]
-    assert any("voltage" in p for p in paths)
-    assert any("status" in p for p in paths)
+def test_aas_anchor_aimc_idshort_path_format(etl_paths):
+    # MQTT is at index 2 (HTTP=0, MODBUS=1, MQTT=2); relations at 0 and 1
+    paths = {p.aas.aimc_idshort_path for p in etl_paths}
+    assert "MappingConfigurations[2].MappingSourceSinkRelations[0]" in paths
+    assert "MappingConfigurations[2].MappingSourceSinkRelations[1]" in paths
 
 
 # --- ExtractSpec ---
@@ -126,50 +127,56 @@ def test_load_sink_idshort_path_voltage(etl_paths):
     assert voltage.load.idshort_path == "MQTT_Data.voltage"
 
 
-# --- AASAnchor ---
+# --- AASAnchor populated ---
 
 def test_aas_anchor_populated(etl_paths):
     assert all(p.aas is not None for p in etl_paths)
 
 
-def test_aas_anchor_aid_submodel_id(etl_paths):
+# --- AIDMetadata ---
+
+def test_aid_metadata_populated(etl_paths):
+    assert all(p.aid is not None for p in etl_paths)
+
+
+def test_aid_metadata_aid_submodel_id(etl_paths):
     expected = "https://example.com/ids/sm/AssetInterfacesDescription"
-    assert all(p.aas.aid_submodel_id == expected for p in etl_paths)
+    assert all(p.aid.aid_submodel_id == expected for p in etl_paths)
 
 
-def test_aas_anchor_voltage_title(etl_paths):
+def test_aid_metadata_voltage_title(etl_paths):
     voltage = next(p for p in etl_paths if "voltage" in p.extract.href)
-    assert voltage.aas.title == "voltage"
+    assert voltage.aid.title == "voltage"
 
 
-def test_aas_anchor_voltage_unit(etl_paths):
+def test_aid_metadata_voltage_unit(etl_paths):
     voltage = next(p for p in etl_paths if "voltage" in p.extract.href)
-    assert voltage.aas.unit == "V"
+    assert voltage.aid.unit == "V"
 
 
-def test_aas_anchor_voltage_data_type(etl_paths):
+def test_aid_metadata_voltage_data_type(etl_paths):
     voltage = next(p for p in etl_paths if "voltage" in p.extract.href)
-    assert voltage.aas.data_type == "integer"
+    assert voltage.aid.data_type == "integer"
 
 
-def test_aas_anchor_voltage_observable(etl_paths):
+def test_aid_metadata_voltage_observable(etl_paths):
     voltage = next(p for p in etl_paths if "voltage" in p.extract.href)
-    assert voltage.aas.observable is True
+    assert voltage.aid.observable is True
 
 
-def test_aas_anchor_voltage_value_range(etl_paths):
+def test_aid_metadata_voltage_value_range(etl_paths):
     voltage = next(p for p in etl_paths if "voltage" in p.extract.href)
-    assert voltage.aas.value_range == ("1", "100")
+    assert voltage.aid.value_range == ("1", "100")
 
 
-def test_aas_anchor_status_not_observable(etl_paths):
+def test_aid_metadata_status_not_observable(etl_paths):
     status = next(p for p in etl_paths if "status" in p.extract.href)
-    assert status.aas.observable is False
+    assert status.aid.observable is False
 
 
-def test_aas_anchor_status_unit_is_none(etl_paths):
+def test_aid_metadata_status_unit_is_none(etl_paths):
     status = next(p for p in etl_paths if "status" in p.extract.href)
-    assert status.aas.unit is None
+    assert status.aid.unit is None
 
 
 # --- NodeRedAnchor ---

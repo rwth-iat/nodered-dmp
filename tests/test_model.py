@@ -4,6 +4,7 @@ import pytest
 
 from nodered_dmp.model import (
     AASAnchor,
+    AIDMetadata,
     ETLPath,
     ETLPathStore,
     ExtractSpec,
@@ -15,8 +16,6 @@ from nodered_dmp.model import (
 
 def make_etl_path(**overrides) -> ETLPath:
     defaults = dict(
-        aimc_submodel_id="https://example.com/aimc/1",
-        aimc_idshort_path="MappingMQTT.Relations.voltage",
         extract=ExtractSpec(
             protocol="mqtt",
             endpoint="mqtt://localhost:1883",
@@ -50,10 +49,11 @@ def test_etl_path_roundtrip_json():
     assert restored == p
 
 
-def test_etl_path_nodered_anchor_none_by_default():
+def test_etl_path_anchors_none_by_default():
     p = make_etl_path()
     assert p.nodered is None
     assert p.aas is None
+    assert p.aid is None
 
 
 def test_transform_default_function_code():
@@ -74,6 +74,10 @@ def test_etl_path_with_anchors():
             column_positions={"mqtt_in": 0, "change_1": 1},
         ),
         aas=AASAnchor(
+            aimc_submodel_id="https://example.com/aimc/1",
+            aimc_idshort_path="MappingConfigurations[2].MappingSourceSinkRelations[0]",
+        ),
+        aid=AIDMetadata(
             aid_submodel_id="https://example.com/aid/1",
             aid_idshort_path="InterfaceMQTT.InterfaceMetadata.Properties.voltage",
             title="voltage",
@@ -82,20 +86,26 @@ def test_etl_path_with_anchors():
         ),
     )
     assert p.nodered.config_node_id == "broker456"
-    assert p.aas.unit == "V"
+    assert p.aas.aimc_submodel_id == "https://example.com/aimc/1"
+    assert p.aid.unit == "V"
 
 
 def test_etl_path_roundtrip_with_anchors():
     p = make_etl_path(
         nodered=NodeRedAnchor(endpoint_node_id="abc123"),
         aas=AASAnchor(
+            aimc_submodel_id="https://example.com/aimc/1",
+            aimc_idshort_path="MappingConfigurations[2].MappingSourceSinkRelations[0]",
+        ),
+        aid=AIDMetadata(
             aid_submodel_id="https://example.com/aid/1",
             aid_idshort_path="InterfaceMQTT.InterfaceMetadata.Properties.voltage",
         ),
     )
     restored = ETLPath.model_validate_json(p.model_dump_json())
     assert restored.nodered.endpoint_node_id == "abc123"
-    assert restored.aas.aid_submodel_id == "https://example.com/aid/1"
+    assert restored.aas.aimc_submodel_id == "https://example.com/aimc/1"
+    assert restored.aid.aid_submodel_id == "https://example.com/aid/1"
 
 
 # --- Store tests ---
@@ -144,13 +154,15 @@ def test_store_find_by_node_id_returns_none_if_missing(store):
 
 def test_store_find_by_aimc_path(store):
     p = make_etl_path(
-        aimc_submodel_id="https://example.com/aimc/1",
-        aimc_idshort_path="MappingMQTT.Relations.voltage",
+        aas=AASAnchor(
+            aimc_submodel_id="https://example.com/aimc/1",
+            aimc_idshort_path="MappingConfigurations[2].MappingSourceSinkRelations[0]",
+        ),
     )
     store.save(p)
     found = store.find_by_aimc_path(
         "https://example.com/aimc/1",
-        "MappingMQTT.Relations.voltage",
+        "MappingConfigurations[2].MappingSourceSinkRelations[0]",
     )
     assert found.etl_path_id == p.etl_path_id
 

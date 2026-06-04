@@ -109,9 +109,8 @@ def test_parse_flow_aas_anchor_is_none(parsed_paths):
     assert all(p.aas is None for p in parsed_paths)
 
 
-def test_parse_flow_aimc_fields_are_empty(parsed_paths):
-    assert all(p.aimc_submodel_id == "" for p in parsed_paths)
-    assert all(p.aimc_idshort_path == "" for p in parsed_paths)
+def test_parse_flow_aid_metadata_is_none(parsed_paths):
+    assert all(p.aid is None for p in parsed_paths)
 
 
 # --- round-trip: modified function code is recovered ---

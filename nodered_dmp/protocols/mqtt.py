@@ -24,6 +24,7 @@ def _build_broker(etl) -> nr.MQTTBroker:
 
 SCHEMA = ProtocolSchema(
     protocol="mqtt",
+    anchor_node_type="mqtt in",
     config=ConfigSlot(
         role="broker",
         node_type="mqtt-broker",

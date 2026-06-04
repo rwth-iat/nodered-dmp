@@ -32,6 +32,7 @@ class ProtocolSchema:
     protocol: str
     chain: list[NodeSlot]
     config: ConfigSlot | None = None
+    anchor_node_type: str = ""  # node type searched for when parsing a flow
 
 
 def build_chain(

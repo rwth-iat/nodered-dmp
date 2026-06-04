@@ -1,12 +1,9 @@
 import nodered_flowgen as nr
 
 from nodered_dmp.model.etl_path import ETLPath
+from nodered_dmp.model.store import ETLPathStore
 from nodered_dmp.protocols.base import build_chain
-from nodered_dmp.protocols.mqtt import SCHEMA as MQTT_SCHEMA
-
-PROTOCOL_SCHEMAS = {
-    "mqtt": MQTT_SCHEMA,
-}
+from nodered_dmp.protocols.schemas import PROTOCOL_SCHEMAS
 
 
 def build_flow(etl_paths: list[ETLPath]) -> nr.Flow:
@@ -34,6 +31,19 @@ def build_flow(etl_paths: list[ETLPath]) -> nr.Flow:
             config_nodes[config_key] = config_node
         build_chain(schema, flow, subflow, etl_path, config_node=config_node)
 
+    return flow
+
+
+def build_and_store_flow(etl_paths: list[ETLPath], store: ETLPathStore) -> nr.Flow:
+    """
+    Build a Node-RED flow and persist the updated ETLPaths (with nodered anchors) to the store.
+
+    build_flow populates etl_path.nodered in memory but does not save. This function
+    ensures the store reflects the populated anchors immediately after building.
+    """
+    flow = build_flow(etl_paths)
+    for etl_path in etl_paths:
+        store.save(etl_path)
     return flow
 
 

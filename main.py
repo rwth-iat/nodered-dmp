@@ -1,13 +1,170 @@
-from nodered_dmp.aas.client import id_to_url
-from nodered_dmp.aas.aas_to_etlpath import parse_aimc
-from nodered_dmp.flow_builder import build_flow
+"""
+nodered-dmp CLI
 
-# SUBMODEL_SERVER = "http://localhost:8081"
-SUBMODEL_SERVER = "http://localhost:8080/api/v3.1"
-AIMC_ID = "https://www.iat.rwth-aachen.de/pls-lab/pumping_station/TU10/F17/AssetInterfacesMappingConfiguration_v1"
+Subcommands:
+  sync-aas    Read an AIMC submodel from an AAS server and reconcile with the store.
+  build-flow  Build a Node-RED flow JSON from the store and write it to a file.
+  sync-flow   Parse a Node-RED flow JSON file and reconcile with the store.
+  write-aas   Write ETLPaths from the store back to the AAS server.
+"""
+
+import argparse
+import json
+import sys
+from pathlib import Path
+
+DEFAULT_STORE = "etl_paths.json"
+
+
+def cmd_sync_aas(args: argparse.Namespace) -> None:
+    from nodered_dmp.aas import sync_aas
+    from nodered_dmp.model import ETLPathStore
+
+    store = ETLPathStore(args.store)
+    result = sync_aas(args.aimc_url, args.server, store)
+
+    print(f"sync-aas complete")
+    print(f"  created : {len(result.created)}")
+    print(f"  updated : {len(result.updated)}")
+    print(f"  deleted : {len(result.deleted)}")
+
+    if result.created:
+        for p in result.created:
+            print(f"    + {p.extract.protocol} {p.extract.href}")
+    if result.updated:
+        for before, after in result.updated:
+            print(f"    ~ {after.extract.protocol} {after.extract.href}")
+    if result.deleted:
+        for p in result.deleted:
+            print(f"    - {p.extract.protocol} {p.extract.href}")
+
+
+def cmd_build_flow(args: argparse.Namespace) -> None:
+    from nodered_dmp.flow_builder import build_and_store_flow
+    from nodered_dmp.model import ETLPathStore
+
+    store = ETLPathStore(args.store)
+    etl_paths = store.load_all()
+
+    if not etl_paths:
+        print("No ETLPaths in store. Run sync-aas or sync-flow first.", file=sys.stderr)
+        sys.exit(1)
+
+    flow = build_and_store_flow(etl_paths, store, label=args.label or None)
+    output = Path(args.output)
+    output.write_text(flow.generate_json())
+    print(f"Flow written to {output}  ({len(etl_paths)} path(s))")
+
+
+def cmd_sync_flow(args: argparse.Namespace) -> None:
+    from nodered_dmp.model import ETLPathStore
+    from nodered_dmp.parse import sync_flow
+
+    flow_file = Path(args.flow)
+    if not flow_file.exists():
+        print(f"Flow file not found: {flow_file}", file=sys.stderr)
+        sys.exit(1)
+
+    nodes = json.loads(flow_file.read_text())
+    store = ETLPathStore(args.store)
+    result = sync_flow(nodes, store)
+
+    print(f"sync-flow complete")
+    print(f"  created : {len(result.created)}")
+    print(f"  updated : {len(result.updated)}")
+    print(f"  deleted : {len(result.deleted)}")
+
+    if result.created:
+        for p in result.created:
+            print(f"    + {p.extract.protocol} {p.extract.href}")
+    if result.updated:
+        for before, after in result.updated:
+            print(f"    ~ {after.extract.protocol} {after.extract.href}")
+    if result.deleted:
+        for p in result.deleted:
+            print(f"    - {p.extract.protocol} {p.extract.href}")
+
+
+def cmd_write_aas(args: argparse.Namespace) -> None:
+    from nodered_dmp.aas import write_to_aas
+    from nodered_dmp.model import ETLPathStore
+
+    store = ETLPathStore(args.store)
+    etl_paths = store.load_all()
+
+    paths_with_aas = [p for p in etl_paths if p.aas is not None]
+    if not paths_with_aas:
+        print("No ETLPaths with AAS anchor in store — nothing to write.", file=sys.stderr)
+        sys.exit(1)
+
+    write_to_aas(etl_paths, args.server)
+    print(f"write-aas complete  ({len(paths_with_aas)} path(s) written)")
+    for p in paths_with_aas:
+        print(f"  {p.extract.protocol} {p.extract.href}  →  {p.aas.aimc_idshort_path}")
+
+
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        prog="nodered-dmp",
+        description="Bidirectional AAS ↔ Node-RED integration tool.",
+    )
+    parser.add_argument(
+        "--store",
+        default=DEFAULT_STORE,
+        metavar="PATH",
+        help=f"ETLPath store file (default: {DEFAULT_STORE})",
+    )
+    sub = parser.add_subparsers(dest="command", required=True)
+
+    # sync-aas
+    p_sync_aas = sub.add_parser(
+        "sync-aas",
+        help="Read AIMC submodel from AAS server and reconcile with the store.",
+    )
+    p_sync_aas.add_argument("--aimc-url", required=True, metavar="URL",
+                            help="Full URL of the AIMC submodel endpoint.")
+    p_sync_aas.add_argument("--server", required=True, metavar="URL",
+                            help="AAS server base URL (e.g. http://localhost:8081).")
+
+    # build-flow
+    p_build = sub.add_parser(
+        "build-flow",
+        help="Build a Node-RED flow JSON from the store.",
+    )
+    p_build.add_argument("--output", default="flow.json", metavar="FILE",
+                         help="Output file for the flow JSON (default: flow.json).")
+    p_build.add_argument("--label", default=None, metavar="LABEL",
+                         help="Flow tab label. Defaults to the AIMC submodel ID.")
+
+    # sync-flow
+    p_sync_flow = sub.add_parser(
+        "sync-flow",
+        help="Parse a Node-RED flow JSON file and reconcile with the store.",
+    )
+    p_sync_flow.add_argument("--flow", required=True, metavar="FILE",
+                             help="Path to the Node-RED flow JSON file.")
+
+    # write-aas
+    p_write = sub.add_parser(
+        "write-aas",
+        help="Write ETLPaths from the store back to the AAS server.",
+    )
+    p_write.add_argument("--server", required=True, metavar="URL",
+                         help="AAS server base URL (e.g. http://localhost:8081).")
+
+    return parser
+
+
+_COMMANDS = {
+    "sync-aas":   cmd_sync_aas,
+    "build-flow": cmd_build_flow,
+    "sync-flow":  cmd_sync_flow,
+    "write-aas":  cmd_write_aas,
+}
 
 if __name__ == "__main__":
-    aimc_url = id_to_url(SUBMODEL_SERVER, AIMC_ID)
-    etl_paths = parse_aimc(aimc_url, SUBMODEL_SERVER)
-    flow = build_flow(etl_paths)
-    print(flow.generate_json())
+    parser = build_parser()
+    args = parser.parse_args()
+
+    # --store applies to all subcommands; attach it to args so each handler can read it
+    _COMMANDS[args.command](args)

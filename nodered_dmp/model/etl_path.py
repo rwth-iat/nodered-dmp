@@ -24,6 +24,7 @@ class NodeRedAnchor(BaseModel):
     endpoint_node_id: str               # MQTTIn / OpcUaItem / HTTPRequest node hex ID
     config_node_id: str | None = None   # MQTTBroker / OpcUaEndpoint node hex ID
     column_positions: dict[str, int] = {}
+    node_ids: dict[str, str] = {}       # role → node hex ID for every chain slot
 
 
 class AASAnchor(BaseModel):

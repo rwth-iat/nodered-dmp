@@ -94,5 +94,6 @@ def _assemble(
         nodered=NodeRedAnchor(
             endpoint_node_id=anchor_node["id"],
             config_node_id=extracted.get("nodered.config_node_id"),
+            node_ids=extracted.get("nodered.node_ids", {}),
         ),
     )

@@ -52,17 +52,25 @@ def build_chain(
     """
     if config_node is None and schema.config:
         config_node = schema.config.builds(etl_path)
+        if etl_path.nodered and etl_path.nodered.config_node_id:
+            config_node.id = etl_path.nodered.config_node_id
         flow.add_node(config_node)
 
     prev_node = None
     endpoint_node = None
     column_positions: dict[str, int] = {}
+    node_ids: dict[str, str] = {}
 
     for col, slot in enumerate(schema.chain):
         if slot.node_type == SUBFLOW_INSTANCE:
             node = subflow.get_instance()
         else:
             node = slot.builds(etl_path, config_node)
+
+        if etl_path.nodered:
+            existing_id = etl_path.nodered.node_ids.get(slot.role)
+            if existing_id:
+                node.id = existing_id
 
         flow.add_node(node, column=col)
 
@@ -73,12 +81,14 @@ def build_chain(
             endpoint_node = node
 
         column_positions[slot.role] = col
+        node_ids[slot.role] = node.id
         prev_node = node
 
     etl_path.nodered = NodeRedAnchor(
         endpoint_node_id=endpoint_node.id,
         config_node_id=config_node.id if config_node else None,
         column_positions=column_positions,
+        node_ids=node_ids,
     )
 
 
@@ -98,9 +108,11 @@ def parse_chain(
     Raises InvalidETLPathError if the chain structure does not match the schema.
     """
     extracted: dict[str, Any] = {}
+    node_ids: dict[str, str] = {}
     current = start_node
 
     for i, slot in enumerate(schema.chain):
+        node_ids[slot.role] = current["id"]
         actual_type = current["type"]
 
         if slot.node_type == SUBFLOW_INSTANCE:
@@ -147,4 +159,5 @@ def parse_chain(
                 )
             current = next_node
 
+    extracted["nodered.node_ids"] = node_ids
     return extracted

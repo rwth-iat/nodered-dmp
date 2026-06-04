@@ -389,6 +389,21 @@ def test_build_chain_opcua_column_positions(built_opcua):
     assert positions["sink"] == 6
 
 
+def test_build_chain_opcua_node_ids_populated(built_opcua):
+    _, etl_path = built_opcua
+    ids = etl_path.nodered.node_ids
+    assert set(ids.keys()) == {"trigger", "endpoint", "client", "pre_change", "transform", "url_setter", "sink"}
+
+
+def test_build_chain_opcua_stable_ids_on_rebuild(built_opcua):
+    _, etl_path_first = built_opcua
+    first_ids = dict(etl_path_first.nodered.node_ids)
+    # Build again with the same etl_path — IDs should be reused
+    flow2, subflow2 = make_flow_and_subflow(extra_columns=2)
+    build_chain(opcua.SCHEMA, flow2, subflow2, etl_path_first)
+    assert etl_path_first.nodered.node_ids == first_ids
+
+
 # --- round-trip test (OPC UA) ---
 
 def test_opcua_round_trip_recovers_etl_fields():

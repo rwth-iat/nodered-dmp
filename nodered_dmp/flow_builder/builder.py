@@ -28,6 +28,8 @@ def build_flow(etl_paths: list[ETLPath], label: str | None = None) -> nr.Flow:
         config_node = config_nodes.get(config_key)
         if config_node is None and schema.config:
             config_node = schema.config.builds(etl_path)
+            if etl_path.nodered and etl_path.nodered.config_node_id:
+                config_node.id = etl_path.nodered.config_node_id
             flow.add_node(config_node)
             config_nodes[config_key] = config_node
         build_chain(schema, flow, subflow, etl_path, config_node=config_node)

@@ -17,6 +17,7 @@ def sync_aas(
     server_base: str,
     store: ETLPathStore,
     dry_run: bool = False,
+    access_token: str | None = None,
 ) -> SyncResult:
     """
     Parse an AIMC submodel and reconcile the results against the store.
@@ -27,9 +28,12 @@ def sync_aas(
 
     When dry_run=True the diff is computed and returned but the store is not modified.
 
+    access_token, if given, is sent as "Authorization: Bearer <token>" on every
+    request to the AAS server.
+
     Returns a SyncResult describing what changed.
     """
-    parsed = parse_aimc(aimc_url, server_base)
+    parsed = parse_aimc(aimc_url, server_base, access_token)
     if not parsed:
         return SyncResult(created=[], updated=[], deleted=[])
 

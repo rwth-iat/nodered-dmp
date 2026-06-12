@@ -80,10 +80,12 @@ def build_property_element(etl_path: ETLPath) -> dict:
     }
 
 
-def write_aid_properties(etl_paths: list[ETLPath], server_base: str) -> None:
+def write_aid_properties(etl_paths: list[ETLPath], server_base: str, access_token: str | None = None) -> None:
     """PUT each property element to the AAS server. Paths without AIDMetadata are skipped."""
     for etl_path in etl_paths:
         if etl_path.aid is None:
             continue
         body = build_property_element(etl_path)
-        put_submodel_element(server_base, etl_path.aid.aid_submodel_id, etl_path.aid.aid_idshort_path, body)
+        put_submodel_element(
+            server_base, etl_path.aid.aid_submodel_id, etl_path.aid.aid_idshort_path, body, access_token
+        )

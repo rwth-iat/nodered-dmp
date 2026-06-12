@@ -14,19 +14,31 @@ def get_host_and_port(url: str) -> tuple[str, str, int]:
     return parsed.scheme, parsed.hostname, parsed.port
 
 
-def get_submodel_json(url: str) -> dict:
-    return requests.get(url).json()
+def _auth_headers(access_token: str | None) -> dict | None:
+    if access_token:
+        return {"Authorization": f"Bearer {access_token}"}
+    return None
 
 
-def get_submodel_element_json(url: str) -> dict:
-    return requests.get(url).json()
+def get_submodel_json(url: str, access_token: str | None = None) -> dict:
+    return requests.get(url, headers=_auth_headers(access_token)).json()
 
 
-def put_submodel(base_url: str, submodel_id: str, body: dict) -> None:
+def get_submodel_element_json(url: str, access_token: str | None = None) -> dict:
+    return requests.get(url, headers=_auth_headers(access_token)).json()
+
+
+def put_submodel(base_url: str, submodel_id: str, body: dict, access_token: str | None = None) -> None:
     b64 = base64.b64encode(submodel_id.encode()).decode()
-    requests.put(f"{base_url}/submodels/{b64}", json=body)
+    requests.put(f"{base_url}/submodels/{b64}", json=body, headers=_auth_headers(access_token))
 
 
-def put_submodel_element(base_url: str, submodel_id: str, idshort_path: str, body: dict) -> None:
+def put_submodel_element(
+    base_url: str, submodel_id: str, idshort_path: str, body: dict, access_token: str | None = None
+) -> None:
     b64 = base64.b64encode(submodel_id.encode()).decode()
-    requests.put(f"{base_url}/submodels/{b64}/submodel-elements/{idshort_path}", json=body)
+    requests.put(
+        f"{base_url}/submodels/{b64}/submodel-elements/{idshort_path}",
+        json=body,
+        headers=_auth_headers(access_token),
+    )

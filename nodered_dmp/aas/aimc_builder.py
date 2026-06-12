@@ -110,7 +110,7 @@ def build_aimc_submodel(etl_paths: list[ETLPath]) -> dict:
     }
 
 
-def write_aimc(etl_paths: list[ETLPath], server_base: str) -> None:
+def write_aimc(etl_paths: list[ETLPath], server_base: str, access_token: str | None = None) -> None:
     """
     PUT each RelationshipElement to its indexed position in the AIMC submodel.
     Paths without AASAnchor or AIDMetadata are skipped.
@@ -128,4 +128,5 @@ def write_aimc(etl_paths: list[ETLPath], server_base: str) -> None:
             etl_path.aas.aimc_submodel_id,
             etl_path.aas.aimc_idshort_path,
             body,
+            access_token,
         )

@@ -21,7 +21,7 @@ def cmd_sync_aas(args: argparse.Namespace) -> None:
     from nodered_dmp.model import ETLPathStore
 
     store = ETLPathStore(args.store)
-    result = sync_aas(args.aimc_url, args.server, store, dry_run=args.dry_run)
+    result = sync_aas(args.aimc_url, args.server, store, dry_run=args.dry_run, access_token=args.access_token)
 
     print("sync-aas" + (" (dry run — store not modified)" if args.dry_run else "") + " complete")
     print(f"  created : {len(result.created)}")
@@ -64,7 +64,7 @@ def cmd_build_flow(args: argparse.Namespace) -> None:
         except FlowNotFoundError:
             pass  # First deploy — nothing to preserve
 
-    flow = build_and_store_flow(etl_paths, store, label=args.label or None)
+    flow = build_and_store_flow(etl_paths, store, label=args.label or None, sink_access_token=args.sink_access_token)
     flow_nodes = json.loads(flow.generate_json())
 
     if old_flow_nodes and old_anchors:
@@ -149,7 +149,7 @@ def cmd_write_aas(args: argparse.Namespace) -> None:
         print("No ETLPaths with AAS anchor in store — nothing to write.", file=sys.stderr)
         sys.exit(1)
 
-    write_to_aas(etl_paths, args.server)
+    write_to_aas(etl_paths, args.server, access_token=args.access_token)
     print(f"write-aas complete  ({len(paths_with_aas)} path(s) written)")
     for p in paths_with_aas:
         print(f"  {p.extract.protocol} {p.extract.href}  →  {p.aas.aimc_idshort_path}")
@@ -179,6 +179,9 @@ def build_parser() -> argparse.ArgumentParser:
                             help="AAS server base URL (e.g. http://localhost:8081).")
     p_sync_aas.add_argument("--dry-run", action="store_true",
                             help="Show what would change without modifying the store.")
+    p_sync_aas.add_argument("--access-token", default=None, metavar="TOKEN",
+                            help="AAS server access token. If given, sent as "
+                                 "'Authorization: Bearer <TOKEN>' on every request to the AAS server.")
 
     # build-flow
     p_build = sub.add_parser(
@@ -193,6 +196,12 @@ def build_parser() -> argparse.ArgumentParser:
                          help="Node-RED server base URL. If given, deploys the flow directly.")
     p_build.add_argument("--token", default=None, metavar="TOKEN",
                          help="Node-RED admin API bearer token (if adminAuth is enabled).")
+    p_build.add_argument("--sink-access-token", default=None, metavar="TOKEN",
+                         help="AAS server access token. If given, every sink request is sent "
+                              "with header 'Authorization: Bearer <TOKEN>', set via the same "
+                              "change node that sets msg.url. Stored as plaintext in flow.json "
+                              "(not in the ETLPath store) — do not commit the generated flow "
+                              "if it contains a real token.")
     p_build.add_argument("--dry-run", action="store_true",
                          help="Preview what would be deployed without actually deploying.")
     p_build.add_argument("--preserve-visual", action="store_true",
@@ -223,6 +232,9 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p_write.add_argument("--server", required=True, metavar="URL",
                          help="AAS server base URL (e.g. http://localhost:8081).")
+    p_write.add_argument("--access-token", default=None, metavar="TOKEN",
+                         help="AAS server access token. If given, sent as "
+                              "'Authorization: Bearer <TOKEN>' on every request to the AAS server.")
 
     return parser
 

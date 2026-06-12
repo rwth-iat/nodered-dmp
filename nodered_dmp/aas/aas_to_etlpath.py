@@ -26,21 +26,24 @@ _SEM_SOURCE_SINK_RELATION = (
 )
 
 
-def parse_aimc(aimc_url: str, server_base: str) -> list[ETLPath]:
+def parse_aimc(aimc_url: str, server_base: str, access_token: str | None = None) -> list[ETLPath]:
     """
     Read an AIMC submodel and the referenced AID submodels to build a fully
     populated list[ETLPath]. Each ETLPath covers one source→sink mapping relation.
 
     Protocols not in _KNOWN_PROTOCOLS are silently skipped.
+
+    access_token, if given, is sent as "Authorization: Bearer <token>" on every
+    request to the AAS server.
     """
-    aimc_json = get_submodel_json(aimc_url)
+    aimc_json = get_submodel_json(aimc_url, access_token)
     aimc_submodel_id = aimc_json["id"]
     etl_paths: list[ETLPath] = []
 
     for top_element in aimc_json["submodelElements"]:
         for config_index, mapping_config in enumerate(top_element.get("value", [])):
             _process_mapping_config(
-                config_index, mapping_config, aimc_submodel_id, server_base, etl_paths
+                config_index, mapping_config, aimc_submodel_id, server_base, etl_paths, access_token
             )
 
     return etl_paths
@@ -49,7 +52,12 @@ def parse_aimc(aimc_url: str, server_base: str) -> list[ETLPath]:
 # --- private helpers ---
 
 def _process_mapping_config(
-    config_index: int, config: dict, aimc_submodel_id: str, server_base: str, out: list[ETLPath]
+    config_index: int,
+    config: dict,
+    aimc_submodel_id: str,
+    server_base: str,
+    out: list[ETLPath],
+    access_token: str | None = None,
 ) -> None:
     interface_keys = None
     relation_elements = []
@@ -65,7 +73,7 @@ def _process_mapping_config(
 
     aid_submodel_id = interface_keys[0]["value"]
     interface_url = _keys_to_url(server_base, interface_keys)
-    interface_json = get_submodel_element_json(interface_url)
+    interface_json = get_submodel_element_json(interface_url, access_token)
 
     endpoint_base = _extract_endpoint_base(interface_json)
     if endpoint_base is None:
@@ -81,7 +89,7 @@ def _process_mapping_config(
         sink_keys = relation["second"]["keys"]
 
         source_url = _keys_to_url(server_base, source_keys)
-        property_json = get_submodel_element_json(source_url)
+        property_json = get_submodel_element_json(source_url, access_token)
 
         href, control_packet = _extract_forms(property_json)
         if href is None:

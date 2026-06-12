@@ -22,7 +22,7 @@ class ConfigSlot:
 class NodeSlot:
     role: str
     node_type: str                          # exact type, or SUBFLOW_INSTANCE for sink
-    builds: Callable                        # (etl_path, config_node | None) → node
+    builds: Callable                        # (etl_path, config_node | None, sink_access_token | None) → node
     extracts: Callable | None = None        # (node_json) → dict[str, Any] | None
     config_ref_field: str | None = None     # field in this node referencing the config node
 
@@ -35,12 +35,30 @@ class ProtocolSchema:
     anchor_node_type: str = ""  # node type searched for when parsing a flow
 
 
+def url_set_rules(sink_url: str, sink_access_token: str | None = None) -> list[dict]:
+    """Change-node rules for the "url_setter" slot: set msg.url, and optionally
+    an Authorization header carrying the sink access token."""
+    rules = [{"t": "set", "p": "url", "pt": "msg", "to": sink_url, "tot": "str"}]
+    if sink_access_token:
+        # CAVEAT: the token is baked into the flow JSON as a plaintext "set"
+        # rule (tot="str"), same as the sink URL above. Anyone with access to
+        # flow.json or a Node-RED export can read it. For sensitive
+        # deployments, replace this with an "env" rule (tot="env") that
+        # references an environment variable on the Node-RED runtime instead.
+        rules.append({
+            "t": "set", "p": "headers.Authorization", "pt": "msg",
+            "to": f"Bearer {sink_access_token}", "tot": "str",
+        })
+    return rules
+
+
 def build_chain(
     schema: ProtocolSchema,
     flow,
     subflow,
     etl_path: ETLPath,
     config_node=None,
+    sink_access_token: str | None = None,
 ) -> None:
     """
     Build the node chain for one ETLPath, add nodes to flow, wire them in order,
@@ -49,6 +67,9 @@ def build_chain(
     config_node may be passed in when multiple ETLPaths share the same config
     (e.g. several MQTT topics on the same broker). If None and schema has a
     ConfigSlot, a new config node is created and added to the flow.
+
+    sink_access_token, if given, is passed through to each slot's builds() so
+    the "url_setter" slot can add an Authorization header rule alongside the URL.
     """
     if config_node is None and schema.config:
         config_node = schema.config.builds(etl_path)
@@ -65,7 +86,7 @@ def build_chain(
         if slot.node_type == SUBFLOW_INSTANCE:
             node = subflow.get_instance()
         else:
-            node = slot.builds(etl_path, config_node)
+            node = slot.builds(etl_path, config_node, sink_access_token)
 
         if etl_path.nodered:
             existing_id = etl_path.nodered.node_ids.get(slot.role)

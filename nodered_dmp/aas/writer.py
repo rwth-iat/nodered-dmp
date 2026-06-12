@@ -3,7 +3,7 @@ from nodered_dmp.aas.aimc_builder import write_aimc
 from nodered_dmp.model.etl_path import ETLPath
 
 
-def write_to_aas(etl_paths: list[ETLPath], server_base: str) -> None:
+def write_to_aas(etl_paths: list[ETLPath], server_base: str, access_token: str | None = None) -> None:
     """
     Write ETLPaths back to the AAS server.
 
@@ -13,6 +13,9 @@ def write_to_aas(etl_paths: list[ETLPath], server_base: str) -> None:
     ETLPaths without an AASAnchor are silently skipped — the AID submodel ID is required
     to locate the element on the server. Populate aas anchors via parse_aimc or sync_aas
     before calling this function.
+
+    access_token, if given, is sent as "Authorization: Bearer <token>" on every
+    request to the AAS server.
     """
-    write_aid_properties(etl_paths, server_base)
-    write_aimc(etl_paths, server_base)
+    write_aid_properties(etl_paths, server_base, access_token)
+    write_aimc(etl_paths, server_base, access_token)

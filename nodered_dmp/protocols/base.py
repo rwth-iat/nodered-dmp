@@ -1,3 +1,4 @@
+import json
 from dataclasses import dataclass, field
 from typing import Any, Callable
 
@@ -36,20 +37,33 @@ class ProtocolSchema:
 
 
 def url_set_rules(sink_url: str, sink_access_token: str | None = None) -> list[dict]:
-    """Change-node rules for the "url_setter" slot: set msg.url, and optionally
-    an Authorization header carrying the sink access token."""
-    rules = [{"t": "set", "p": "url", "pt": "msg", "to": sink_url, "tot": "str"}]
+    """Change-node rules for the "url_setter" slot: set msg.url, and stash the
+    sink request headers (currently just Authorization, if a token is
+    configured) in msg._headers. The AASInterface subflow applies these via
+    restore_headers_rule() immediately before each outgoing HTTP request,
+    since the "http request" node overwrites msg.headers with the response
+    headers of each call."""
+    headers: dict[str, str] = {}
     if sink_access_token:
         # CAVEAT: the token is baked into the flow JSON as a plaintext "set"
-        # rule (tot="str"), same as the sink URL above. Anyone with access to
+        # rule (tot="json"), same as the sink URL above. Anyone with access to
         # flow.json or a Node-RED export can read it. For sensitive
         # deployments, replace this with an "env" rule (tot="env") that
         # references an environment variable on the Node-RED runtime instead.
-        rules.append({
-            "t": "set", "p": "headers.Authorization", "pt": "msg",
-            "to": f"Bearer {sink_access_token}", "tot": "str",
-        })
-    return rules
+        headers["Authorization"] = f"Bearer {sink_access_token}"
+    return [
+        {"t": "set", "p": "url", "pt": "msg", "to": sink_url, "tot": "str"},
+        {"t": "set", "p": "_headers", "pt": "msg", "to": json.dumps(headers), "tot": "json"},
+    ]
+
+
+def restore_headers_rule() -> dict:
+    """Change-node rule that replaces msg.headers with msg._headers. Used
+    before each outgoing HTTP request in the AASInterface subflow: a full
+    replace (not a merge) so that response headers left over from a prior
+    request (e.g. content-length, content-type) don't leak into the next
+    request."""
+    return {"t": "set", "p": "headers", "pt": "msg", "to": "_headers", "tot": "msg"}
 
 
 def build_chain(

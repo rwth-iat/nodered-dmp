@@ -2,7 +2,7 @@ import nodered_flowgen as nr
 
 from nodered_dmp.model.etl_path import ETLPath
 from nodered_dmp.model.store import ETLPathStore
-from nodered_dmp.protocols.base import build_chain
+from nodered_dmp.protocols.base import build_chain, restore_headers_rule
 from nodered_dmp.protocols.schemas import PROTOCOL_SCHEMAS
 
 
@@ -58,14 +58,16 @@ def build_and_store_flow(
 def _build_aas_interface_subflow(flow: nr.Flow) -> nr.Subflow:
     subflow = nr.Subflow(
         name="AASInterface",
-        columns=[120, 320, 520, 770],
+        columns=[120, 270, 420, 570, 720, 870, 1070],
         x_offset=200,
         y_offset=140,
     )
+    restore_headers_get = nr.Change(restore_headers_rule())
+    subflow.add_node(restore_headers_get, column=0)
     get_property = nr.HTTPRequest(name="get property")
-    subflow.add_node(get_property, column=0)
+    subflow.add_node(get_property, column=1)
     convert_json = nr.Json()
-    subflow.add_node(convert_json, column=1)
+    subflow.add_node(convert_json, column=2)
     change_value = nr.Change({
         "t": "move",
         "p": "updateValue",
@@ -73,12 +75,25 @@ def _build_aas_interface_subflow(flow: nr.Flow) -> nr.Subflow:
         "to": "payload.value",
         "tot": "msg",
     })
-    subflow.add_node(change_value, column=2)
+    subflow.add_node(change_value, column=3)
+    to_string = nr.Change({
+        "t": "set",
+        "p": "payload.value",
+        "pt": "msg",
+        "to": "$string(payload.value)",
+        "tot": "jsonata",
+    }, name="toString()")
+    subflow.add_node(to_string, column=4)
+    restore_headers_put = nr.Change(restore_headers_rule())
+    subflow.add_node(restore_headers_put, column=5)
     put_http_request = nr.HTTPRequest(method="PUT", name="write property")
-    subflow.add_node(put_http_request, column=3)
-    subflow.connect_to_input(get_property)
+    subflow.add_node(put_http_request, column=6)
+    subflow.connect_to_input(restore_headers_get)
+    subflow.connect_nodes(restore_headers_get, get_property)
     subflow.connect_nodes(get_property, convert_json)
     subflow.connect_nodes(convert_json, change_value)
-    subflow.connect_nodes(change_value, put_http_request)
+    subflow.connect_nodes(change_value, to_string)
+    subflow.connect_nodes(to_string, restore_headers_put)
+    subflow.connect_nodes(restore_headers_put, put_http_request)
     flow.add_subflow(subflow)
     return subflow

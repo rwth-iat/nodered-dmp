@@ -48,7 +48,7 @@ def built_flow():
 
 
 def test_flow_builder_node_count(built_flow):
-    assert len(built_flow) == 17
+    assert len(built_flow) == 20
 
 
 def test_flow_builder_has_tab_and_subflow(built_flow):

@@ -28,22 +28,9 @@ This project also depends on [nodered-flowgen](https://github.com/rwth-iat/noder
 git clone https://github.com/rwth-iat/nodered-flowgen ../nodered-flowgen
 ```
 
-## Configuration
+## Examples
 
-Edit `main.py` to point to your AAS server:
-
-```python
-SUBMODEL_SERVER = "http://localhost:8081"
-AIMC_ID = "https://example.com/ids/sm/AssetInterfacesMappingConfiguration"
-```
-
-## Running
-
-```bash
-uv run main.py
-```
-
-The generated flow is printed to stdout as JSON. Import it directly into Node-RED via **Menu → Import**.
+[Set up and run either AIMC demo](examples/README.md).
 
 ## Testing
 

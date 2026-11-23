@@ -1,7 +1,7 @@
 import base64
 from urllib.parse import urlparse
 
-from nodered_dmp.aas.client import get_submodel_element_json, get_submodel_json
+from nodered_dmp.aas.client import get_submodel_element_json, get_submodel_json, id_to_url
 from nodered_dmp.model.etl_path import (
     AASAnchor,
     AIDMetadata,
@@ -37,6 +37,9 @@ def parse_aimc(aimc_url: str, server_base: str, access_token: str | None = None)
     request to the AAS server.
     """
     aimc_json = get_submodel_json(aimc_url, access_token)
+    if _AIMC_V2 in _semantic_id_values(aimc_json):
+        return _parse_aimc_v2(aimc_json, server_base, access_token)
+
     aimc_submodel_id = aimc_json["id"]
     etl_paths: list[ETLPath] = []
 
@@ -207,3 +210,85 @@ def _semantic_id_list_element_values(element: dict) -> list[str]:
     if not isinstance(sem, dict):
         return []
     return [k["value"] for k in sem.get("keys", [])]
+
+_AIMC_V2 = "https://admin-shell.io/idta/AssetInterfacesMappingConfiguration/2/0/Submodel"
+_MEASUREMENT = "https://admin-shell.io/idta/SubmodelTemplate/measurementValue/1/0"
+
+
+def _children(element: dict) -> dict:
+    return {child.get("idShort"): child for child in element.get("value") or []}
+
+
+def _entry(element: dict, kind: str) -> tuple[str, list[dict]]:
+    fields = _children(element)
+    return fields[kind + "Id"]["value"], fields[kind]["value"]["keys"]
+
+
+def _parse_aimc_v2(aimc: dict, base: str, token: str | None) -> list[ETLPath]:
+    configs = next((e for e in aimc["submodelElements"] if e.get("idShort") == "MappingConfigurations"), {})
+    submodels = {}
+
+    def semantics(submodel_id):
+        if submodel_id not in submodels:
+            url = id_to_url(base, submodel_id)
+            submodels[submodel_id] = _semantic_id_values(get_submodel_json(url, token))
+        return submodels[submodel_id]
+
+    paths = []
+    targets = set()
+    for config_index, config in enumerate(configs.get("value") or []):
+        name = f"MappingConfigurations[{config_index}]"
+        fields = _children(config)
+        try:
+            sinks = {}
+            for index, sink in enumerate(fields.get("Sinks", {}).get("value") or []):
+                identifier, keys = _entry(sink, "Sink")
+                if keys[-1]["type"] != "Property" or _MEASUREMENT not in semantics(keys[0]["value"]):
+                    continue
+                if identifier in sinks:
+                    raise ValueError(f"ambiguous MeasurementValue sink for {identifier}")
+                sinks[identifier] = (index, keys)
+            if not sinks:
+                continue
+
+            sources = {}
+            for source in fields.get("Sources", {}).get("value") or []:
+                identifier, keys = _entry(source, "Source")
+                if identifier not in sinks:
+                    continue
+                interface = get_submodel_element_json(_keys_to_url(base, keys[:2]), token)
+                endpoint = _extract_endpoint_base(interface)
+                if not endpoint:
+                    raise ValueError(f"missing AID endpoint for {identifier}")
+                if urlparse(endpoint).scheme != "mqtt":
+                    continue
+                if identifier in sources:
+                    raise ValueError(f"ambiguous MQTT source for {identifier}")
+                sources[identifier] = (keys, endpoint)
+
+            if sources and str(fields.get("Transformation", {}).get("value") or "").strip():
+                raise ValueError("Lua transformations are not supported")
+
+            for identifier, (keys, endpoint) in sources.items():
+                signal = get_submodel_element_json(_keys_to_url(base, keys), token)
+                href, control_packet = _extract_forms(signal)
+                if not href:
+                    raise ValueError(f"missing MQTT topic in forms.href for {identifier}")
+                index, target = sinks[identifier]
+                sink_url = _keys_to_url(base, target)
+                if sink_url in targets:
+                    raise ValueError(f"ambiguous mapping to {sink_url}")
+                targets.add(sink_url)
+                paths.append(ETLPath(
+                    extract=ExtractSpec(protocol="mqtt", endpoint=endpoint,
+                                        href=href, control_packet=control_packet),
+                    transform=TransformSpec(),
+                    load=LoadSpec(sink_url=sink_url, submodel_id=target[0]["value"],
+                                  idshort_path=_idshort_path(target)),
+                    aas=AASAnchor(aimc_submodel_id=aimc["id"],
+                                  aimc_idshort_path=f"{name}.Sinks[{index}]", aimc_version="2.0"),
+                    aid=_extract_aid_metadata(signal, keys[0]["value"], _idshort_path(keys)),
+                ))
+        except (KeyError, IndexError, TypeError, ValueError) as exc:
+            raise ValueError(f"{name}: {exc}") from exc
+    return paths

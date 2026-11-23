@@ -1,0 +1,14 @@
+name: nodered-dmp-examples
+services:
+  aas:
+    image: eclipsebasyx/aas-environment:2.0.0-SNAPSHOT
+    ports:
+      - "127.0.0.1:8081:8081"
+      - "127.0.0.1:1880:1880"
+  node-red:
+    image: nodered/node-red:5.0.9-24
+    network_mode: service:aas
+  mqtt:
+    image: eclipse-mosquitto:2
+    command: ["mosquitto", "-c", "/mosquitto-no-auth.conf"]
+    network_mode: service:aas

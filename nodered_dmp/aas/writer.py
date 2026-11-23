@@ -17,5 +17,7 @@ def write_to_aas(etl_paths: list[ETLPath], server_base: str, access_token: str |
     access_token, if given, is sent as "Authorization: Bearer <token>" on every
     request to the AAS server.
     """
+    if any(path.aas and path.aas.aimc_version == "2.0" for path in etl_paths):
+        raise ValueError("AIMC 2.0 write-back is not supported")
     write_aid_properties(etl_paths, server_base, access_token)
     write_aimc(etl_paths, server_base, access_token)

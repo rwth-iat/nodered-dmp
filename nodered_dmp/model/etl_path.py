@@ -28,6 +28,7 @@ class NodeRedAnchor(BaseModel):
 
 
 class AASAnchor(BaseModel):
+    aimc_version: str = "1.0"
     aimc_submodel_id: str       # AIMC submodel ID (URI)
     aimc_idshort_path: str      # indexed path to the RelationshipElement, e.g. "MappingConfigurations[2].MappingSourceSinkRelations[0]"
 

@@ -1,0 +1,1725 @@
+{
+  "assetAdministrationShells": [
+    {
+      "idShort": "SampleAAS",
+      "modelType": "AssetAdministrationShell",
+      "id": "https://example.com/ids/aas/7474_9002_6022_1115",
+      "assetInformation": {
+        "assetKind": "Type",
+        "globalAssetId": "https://example.com/ids/asset/3071_4170_8032_4893"
+      },
+      "submodels": [
+        {
+          "type": "ModelReference",
+          "keys": [
+            {
+              "type": "Submodel",
+              "value": "https://example.com/ids/sm/AssetInterfacesDescription"
+            }
+          ]
+        },
+        {
+          "type": "ModelReference",
+          "keys": [
+            {
+              "type": "Submodel",
+              "value": "https://example.com/ids/sm/AssetInterfacesMappingConfiguration/2/0"
+            }
+          ]
+        },
+        {
+          "type": "ModelReference",
+          "keys": [
+            {
+              "type": "Submodel",
+              "value": "https://example.com/ids/sm/MeasurementValue"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "submodels": [
+    {
+      "idShort": "AssetInterfacesDescription",
+      "description": [
+        {
+          "language": "en",
+          "text": "Counter example Thing"
+        },
+        {
+          "language": "de",
+          "text": "Zähler Beispiel Ding"
+        },
+        {
+          "language": "it",
+          "text": "Contatore di esempio"
+        }
+      ],
+      "modelType": "Submodel",
+      "id": "https://example.com/ids/sm/AssetInterfacesDescription",
+      "semanticId": {
+        "type": "ExternalReference",
+        "keys": [
+          {
+            "type": "GlobalReference",
+            "value": "https://www.w3.org/2019/wot/td#"
+          }
+        ]
+      },
+      "submodelElements": [
+        {
+          "idShort": "InterfaceMQTT",
+          "modelType": "SubmodelElementCollection",
+          "value": [
+            {
+              "idShort": "title",
+              "modelType": "Property",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "https://www.w3.org/2019/wot/td#title"
+                  }
+                ]
+              },
+              "value": "DeviceSample",
+              "valueType": "xs:string"
+            },
+            {
+              "idShort": "support",
+              "modelType": "Property",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "https://www.w3.org/2019/wot/td#supportContact"
+                  }
+                ]
+              },
+              "value": "https://github.com/eclipse-thingweb/node-wot/",
+              "valueType": "xs:anyURI"
+            },
+            {
+              "idShort": "EndpointMetadata",
+              "modelType": "SubmodelElementCollection",
+              "value": [
+                {
+                  "idShort": "base",
+                  "modelType": "Property",
+                  "semanticId": {
+                    "type": "ExternalReference",
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://www.w3.org/2019/wot/td#base"
+                      }
+                    ]
+                  },
+                  "value": "mqtt://localhost:1883",
+                  "valueType": "xs:anyURI"
+                },
+                {
+                  "idShort": "contentType",
+                  "modelType": "Property",
+                  "semanticId": {
+                    "type": "ExternalReference",
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://www.w3.org/2019/wot/hypermedia#forContentType"
+                      }
+                    ]
+                  },
+                  "value": "application/json",
+                  "valueType": "xs:string"
+                },
+                {
+                  "idShort": "securityDefinitions",
+                  "modelType": "SubmodelElementCollection",
+                  "semanticId": {
+                    "type": "ExternalReference",
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://www.w3.org/2019/wot/td#definesSecurityScheme"
+                      }
+                    ]
+                  },
+                  "value": [
+                    {
+                      "idShort": "nosec_sc",
+                      "modelType": "SubmodelElementCollection",
+                      "value": [
+                        {
+                          "idShort": "scheme",
+                          "modelType": "Property",
+                          "value": "nosec",
+                          "valueType": "xs:string"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "idShort": "InterfaceMetadata",
+              "modelType": "SubmodelElementCollection",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "https://www.w3.org/2019/wot/td#InteractionAffordance"
+                  }
+                ]
+              },
+              "value": [
+                {
+                  "idShort": "Properties",
+                  "modelType": "SubmodelElementCollection",
+                  "semanticId": {
+                    "type": "ExternalReference",
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://www.w3.org/2019/wot/td#PropertyAffordance"
+                      }
+                    ]
+                  },
+                  "value": [
+                    {
+                      "idShort": "voltage",
+                      "description": [
+                        {
+                          "language": "en",
+                          "text": "Current counter value"
+                        },
+                        {
+                          "language": "de",
+                          "text": "Derzeitiger Zählerwert"
+                        },
+                        {
+                          "language": "it",
+                          "text": "Valore attuale del contatore"
+                        }
+                      ],
+                      "modelType": "SubmodelElementCollection",
+                      "semanticId": {
+                        "type": "ExternalReference",
+                        "keys": [
+                          {
+                            "type": "GlobalReference",
+                            "value": "https://www.w3.org/2019/wot/td#hasPropertyAffordance"
+                          }
+                        ]
+                      },
+                      "value": [
+                        {
+                          "idShort": "type",
+                          "modelType": "Property",
+                          "semanticId": {
+                            "type": "ExternalReference",
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "https://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+                              }
+                            ]
+                          },
+                          "value": "integer",
+                          "valueType": "xs:string"
+                        },
+                        {
+                          "idShort": "title",
+                          "modelType": "Property",
+                          "semanticId": {
+                            "type": "ExternalReference",
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "https://www.w3.org/2019/wot/td#title"
+                              }
+                            ]
+                          },
+                          "value": "voltage",
+                          "valueType": "xs:string"
+                        },
+                        {
+                          "idShort": "observable",
+                          "modelType": "Property",
+                          "semanticId": {
+                            "type": "ExternalReference",
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "https://www.w3.org/2019/wot/td#isObservable"
+                              }
+                            ]
+                          },
+                          "value": "true",
+                          "valueType": "xs:boolean"
+                        },
+                        {
+                          "idShort": "const",
+                          "modelType": "Property",
+                          "semanticId": {
+                            "type": "ExternalReference",
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "https://www.w3.org/2019/wot/json-schema#const"
+                              }
+                            ]
+                          },
+                          "value": "22",
+                          "valueType": "xs:int"
+                        },
+                        {
+                          "idShort": "default",
+                          "modelType": "Property",
+                          "semanticId": {
+                            "type": "ExternalReference",
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "https://www.w3.org/2019/wot/json-schema#default"
+                              }
+                            ]
+                          },
+                          "value": "integer",
+                          "valueType": "xs:string"
+                        },
+                        {
+                          "idShort": "unit",
+                          "modelType": "Property",
+                          "semanticId": {
+                            "type": "ExternalReference",
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "https://schema.org/unitCode"
+                              }
+                            ]
+                          },
+                          "value": "V",
+                          "valueType": "xs:string"
+                        },
+                        {
+                          "idShort": "range",
+                          "modelType": "Range",
+                          "semanticId": {
+                            "type": "ExternalReference",
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "https://www.w3.org/2019/wot/json-schema#minimum"
+                              }
+                            ]
+                          },
+                          "supplementalSemanticIds": [
+                            {
+                              "type": "ExternalReference",
+                              "keys": [
+                                {
+                                  "type": "GlobalReference",
+                                  "value": "https://www.w3.org/2019/wot/json-schema#maximum"
+                                }
+                              ]
+                            }
+                          ],
+                          "valueType": "xs:integer",
+                          "min": "1",
+                          "max": "100"
+                        },
+                        {
+                          "idShort": "forms",
+                          "modelType": "SubmodelElementCollection",
+                          "semanticId": {
+                            "type": "ExternalReference",
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "https://www.w3.org/2019/wot/td#hasForm"
+                              }
+                            ]
+                          },
+                          "value": [
+                            {
+                              "idShort": "href",
+                              "modelType": "Property",
+                              "semanticId": {
+                                "type": "ExternalReference",
+                                "keys": [
+                                  {
+                                    "type": "GlobalReference",
+                                    "value": "https://www.w3.org/2019/wot/hypermedia#hasTarget"
+                                  }
+                                ]
+                              },
+                              "value": "/sampleDevice/properties/voltage",
+                              "valueType": "xs:string"
+                            },
+                            {
+                              "idShort": "mqv_controlPacket",
+                              "modelType": "Property",
+                              "value": "subscribe",
+                              "valueType": "xs:string"
+                            },
+                            {
+                              "idShort": "contentType",
+                              "modelType": "Property",
+                              "semanticId": {
+                                "type": "ExternalReference",
+                                "keys": [
+                                  {
+                                    "type": "GlobalReference",
+                                    "value": "https://www.w3.org/2019/wot/hypermedia#forContentType"
+                                  }
+                                ]
+                              },
+                              "value": "application/json",
+                              "valueType": "xs:string"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "idShort": "status",
+                      "description": [
+                        {
+                          "language": "en",
+                          "text": "Current counter value as SVG image"
+                        },
+                        {
+                          "language": "de",
+                          "text": "Aktueller Zählerwert als SVG-Bild"
+                        },
+                        {
+                          "language": "it",
+                          "text": "Valore attuale del contatore come immagine SVG"
+                        }
+                      ],
+                      "modelType": "SubmodelElementCollection",
+                      "value": [
+                        {
+                          "idShort": "type",
+                          "modelType": "Property",
+                          "semanticId": {
+                            "type": "ExternalReference",
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "https://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+                              }
+                            ]
+                          },
+                          "value": "string",
+                          "valueType": "xs:string"
+                        },
+                        {
+                          "idShort": "title",
+                          "modelType": "Property",
+                          "semanticId": {
+                            "type": "ExternalReference",
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "https://www.w3.org/2019/wot/td#title"
+                              }
+                            ]
+                          },
+                          "value": "status",
+                          "valueType": "xs:string"
+                        },
+                        {
+                          "idShort": "const",
+                          "modelType": "Property",
+                          "semanticId": {
+                            "type": "ExternalReference",
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "https://www.w3.org/2019/wot/json-schema#const"
+                              }
+                            ]
+                          },
+                          "value": "22",
+                          "valueType": "xs:int"
+                        },
+                        {
+                          "idShort": "default",
+                          "modelType": "Property",
+                          "semanticId": {
+                            "type": "ExternalReference",
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "https://www.w3.org/2019/wot/json-schema#default"
+                              }
+                            ]
+                          },
+                          "value": "integer",
+                          "valueType": "xs:string"
+                        },
+                        {
+                          "idShort": "unit",
+                          "modelType": "Property",
+                          "semanticId": {
+                            "type": "ExternalReference",
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "https://schema.org/unitCode"
+                              }
+                            ]
+                          },
+                          "valueType": "xs:string"
+                        },
+                        {
+                          "idShort": "observable",
+                          "modelType": "Property",
+                          "value": "false",
+                          "valueType": "xs:boolean"
+                        },
+                        {
+                          "idShort": "lengthRange",
+                          "modelType": "Range",
+                          "semanticId": {
+                            "type": "ExternalReference",
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "https://www.w3.org/2019/wot/json-schema#minimum"
+                              }
+                            ]
+                          },
+                          "supplementalSemanticIds": [
+                            {
+                              "type": "ExternalReference",
+                              "keys": [
+                                {
+                                  "type": "GlobalReference",
+                                  "value": "https://www.w3.org/2019/wot/json-schema#maximum"
+                                }
+                              ]
+                            }
+                          ],
+                          "valueType": "xs:integer",
+                          "min": "1",
+                          "max": "25"
+                        },
+                        {
+                          "idShort": "forms",
+                          "modelType": "SubmodelElementCollection",
+                          "semanticId": {
+                            "type": "ExternalReference",
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "https://www.w3.org/2019/wot/td#hasForm"
+                              }
+                            ]
+                          },
+                          "value": [
+                            {
+                              "idShort": "href",
+                              "modelType": "Property",
+                              "semanticId": {
+                                "type": "ExternalReference",
+                                "keys": [
+                                  {
+                                    "type": "GlobalReference",
+                                    "value": "https://www.w3.org/2019/wot/hypermedia#hasTarget"
+                                  }
+                                ]
+                              },
+                              "value": "/sampleDevice/properties/status",
+                              "valueType": "xs:string"
+                            },
+                            {
+                              "idShort": "mqv_controlPacket",
+                              "modelType": "Property",
+                              "value": "publish",
+                              "valueType": "xs:string"
+                            },
+                            {
+                              "idShort": "contentType",
+                              "modelType": "Property",
+                              "semanticId": {
+                                "type": "ExternalReference",
+                                "keys": [
+                                  {
+                                    "type": "GlobalReference",
+                                    "value": "https://www.w3.org/2019/wot/hypermedia#forContentType"
+                                  }
+                                ]
+                              },
+                              "value": "application/json",
+                              "valueType": "xs:string"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "idShort": "timestamp",
+                      "description": [
+                        {
+                          "language": "en",
+                          "text": "Current counter value"
+                        },
+                        {
+                          "language": "de",
+                          "text": "Derzeitiger Zählerwert"
+                        },
+                        {
+                          "language": "it",
+                          "text": "Valore attuale del contatore"
+                        }
+                      ],
+                      "modelType": "SubmodelElementCollection",
+                      "semanticId": {
+                        "type": "ExternalReference",
+                        "keys": [
+                          {
+                            "type": "GlobalReference",
+                            "value": "https://www.w3.org/2019/wot/td#hasPropertyAffordance"
+                          }
+                        ]
+                      },
+                      "value": [
+                        {
+                          "idShort": "type",
+                          "modelType": "Property",
+                          "semanticId": {
+                            "type": "ExternalReference",
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "https://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+                              }
+                            ]
+                          },
+                          "value": "string",
+                          "valueType": "xs:string"
+                        },
+                        {
+                          "idShort": "title",
+                          "modelType": "Property",
+                          "semanticId": {
+                            "type": "ExternalReference",
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "https://www.w3.org/2019/wot/td#title"
+                              }
+                            ]
+                          },
+                          "value": "Measurement timestamp",
+                          "valueType": "xs:string"
+                        },
+                        {
+                          "idShort": "forms",
+                          "modelType": "SubmodelElementCollection",
+                          "semanticId": {
+                            "type": "ExternalReference",
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "https://www.w3.org/2019/wot/td#hasForm"
+                              }
+                            ]
+                          },
+                          "value": [
+                            {
+                              "idShort": "href",
+                              "modelType": "Property",
+                              "semanticId": {
+                                "type": "ExternalReference",
+                                "keys": [
+                                  {
+                                    "type": "GlobalReference",
+                                    "value": "https://www.w3.org/2019/wot/hypermedia#hasTarget"
+                                  }
+                                ]
+                              },
+                              "value": "/sampleDevice/properties/timestamp",
+                              "valueType": "xs:string"
+                            },
+                            {
+                              "idShort": "mqv_controlPacket",
+                              "modelType": "Property",
+                              "value": "subscribe",
+                              "valueType": "xs:string"
+                            },
+                            {
+                              "idShort": "contentType",
+                              "modelType": "Property",
+                              "semanticId": {
+                                "type": "ExternalReference",
+                                "keys": [
+                                  {
+                                    "type": "GlobalReference",
+                                    "value": "https://www.w3.org/2019/wot/hypermedia#forContentType"
+                                  }
+                                ]
+                              },
+                              "value": "application/json",
+                              "valueType": "xs:string"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "idShort": "Actions",
+                  "modelType": "SubmodelElementCollection",
+                  "semanticId": {
+                    "type": "ExternalReference",
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://www.w3.org/2019/wot/td#ActionAffordance"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "idShort": "Events",
+                  "modelType": "SubmodelElementCollection",
+                  "semanticId": {
+                    "type": "ExternalReference",
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://www.w3.org/2019/wot/td#EventAffordance"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "idShort": "AssetInterfacesMappingConfiguration",
+      "displayName": [
+        {
+          "language": "en",
+          "text": "Asset interfaces mapping configuration"
+        }
+      ],
+      "description": [
+        {
+          "language": "en",
+          "text": "The AIMC 2.0 is used to describe how data is mapped from asset to AAS or from AAS to AAS."
+        }
+      ],
+      "modelType": "Submodel",
+      "id": "https://example.com/ids/sm/AssetInterfacesMappingConfiguration/2/0",
+      "administration": {
+        "version": "2",
+        "revision": "0",
+        "templateId": "https://admin-shell.io/IDTA02027-2-0"
+      },
+      "semanticId": {
+        "type": "ExternalReference",
+        "keys": [
+          {
+            "type": "GlobalReference",
+            "value": "https://admin-shell.io/idta/AssetInterfacesMappingConfiguration/2/0/Submodel"
+          }
+        ]
+      },
+      "submodelElements": [
+        {
+          "idShort": "MappingConfigurations",
+          "displayName": [
+            {
+              "language": "en",
+              "text": "Mapping configurations"
+            }
+          ],
+          "description": [
+            {
+              "language": "en",
+              "text": "List of MappingConfigurations that each map and transform data from their sources to their sinks."
+            }
+          ],
+          "modelType": "SubmodelElementList",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/idta/AssetInterfacesMappingConfiguration/1/0/MappingConfigurations"
+              }
+            ]
+          },
+          "orderRelevant": false,
+          "typeValueListElement": "SubmodelElementCollection",
+          "semanticIdListElement": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/idta/AssetInterfacesMappingConfiguration/2/0/MappingConfiguration"
+              }
+            ]
+          },
+          "value": [
+            {
+              "displayName": [
+                {
+                  "language": "en",
+                  "text": "Mapping configuration"
+                }
+              ],
+              "description": [
+                {
+                  "language": "en",
+                  "text": "A MappingConfiguration defines one logical unit of sources (inputs) and sinks (outputs) that are in relation to one another. The relation can be expressed via a transformation."
+                }
+              ],
+              "modelType": "SubmodelElementCollection",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "https://admin-shell.io/idta/AssetInterfacesMappingConfiguration/2/0/MappingConfiguration"
+                  }
+                ]
+              },
+              "value": [
+                {
+                  "idShort": "Sources",
+                  "displayName": [
+                    {
+                      "language": "en",
+                      "text": "Sources"
+                    }
+                  ],
+                  "description": [
+                    {
+                      "language": "en",
+                      "text": "This list includes all data sources that are used in this MappingConfiguration."
+                    }
+                  ],
+                  "modelType": "SubmodelElementList",
+                  "semanticId": {
+                    "type": "ExternalReference",
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://admin-shell.io/idta/AssetInterfacesMappingConfiguration/2/0/MappingConfiguration/Sources"
+                      }
+                    ]
+                  },
+                  "orderRelevant": false,
+                  "typeValueListElement": "SubmodelElementCollection",
+                  "semanticIdListElement": {
+                    "type": "ExternalReference",
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://admin-shell.io/idta/AssetInterfacesMappingConfiguration/2/0/MappingConfiguration/Source"
+                      }
+                    ]
+                  },
+                  "value": [
+                    {
+                      "displayName": [
+                        {
+                          "language": "en",
+                          "text": "Source"
+                        }
+                      ],
+                      "description": [
+                        {
+                          "language": "en",
+                          "text": "A data source is defined by a Source reference, PollingInterval and SourceId."
+                        }
+                      ],
+                      "modelType": "SubmodelElementCollection",
+                      "semanticId": {
+                        "type": "ExternalReference",
+                        "keys": [
+                          {
+                            "type": "GlobalReference",
+                            "value": "https://admin-shell.io/idta/AssetInterfacesMappingConfiguration/2/0/MappingConfiguration/Source"
+                          }
+                        ]
+                      },
+                      "value": [
+                        {
+                          "idShort": "Source",
+                          "displayName": [
+                            {
+                              "language": "en",
+                              "text": "Source"
+                            }
+                          ],
+                          "description": [
+                            {
+                              "language": "en",
+                              "text": "This holds a reference to the respective SubmodelElement used as data source. A data source can be any SubmodelElement including those defined in the InteractionMetadata of AID Submodels for fetching live-data from assets."
+                            }
+                          ],
+                          "modelType": "ReferenceElement",
+                          "semanticId": {
+                            "type": "ExternalReference",
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "https://admin-shell.io/idta/AssetInterfacesMappingConfiguration/2/0/MappingConfiguration/Source/Source"
+                              }
+                            ]
+                          },
+                          "value": {
+                            "type": "ModelReference",
+                            "keys": [
+                              {
+                                "type": "Submodel",
+                                "value": "https://example.com/ids/sm/AssetInterfacesDescription"
+                              },
+                              {
+                                "type": "SubmodelElementCollection",
+                                "value": "InterfaceMQTT"
+                              },
+                              {
+                                "type": "SubmodelElementCollection",
+                                "value": "InterfaceMetadata"
+                              },
+                              {
+                                "type": "SubmodelElementCollection",
+                                "value": "Properties"
+                              },
+                              {
+                                "type": "SubmodelElementCollection",
+                                "value": "voltage"
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "idShort": "SourceId",
+                          "displayName": [
+                            {
+                              "language": "en",
+                              "text": "Source ID"
+                            }
+                          ],
+                          "description": [
+                            {
+                              "language": "en",
+                              "text": "This is a unique and non-empty identifier that facilitates data access in the Lua transformation or establishes a relationship to a corresponding sink when no transformation is given. It must only be unique with respect to the Sources-list of the parent MappingConfiguration and not globally."
+                            }
+                          ],
+                          "modelType": "Property",
+                          "semanticId": {
+                            "type": "ExternalReference",
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "https://admin-shell.io/idta/AssetInterfacesMappingConfiguration/2/0/MappingConfiguration/Source/SourceId"
+                              }
+                            ]
+                          },
+                          "value": "voltage",
+                          "valueType": "xs:string"
+                        }
+                      ]
+                    },
+                    {
+                      "displayName": [
+                        {
+                          "language": "en",
+                          "text": "Source"
+                        }
+                      ],
+                      "description": [
+                        {
+                          "language": "en",
+                          "text": "A data source is defined by a Source reference, PollingInterval and SourceId."
+                        }
+                      ],
+                      "modelType": "SubmodelElementCollection",
+                      "semanticId": {
+                        "type": "ExternalReference",
+                        "keys": [
+                          {
+                            "type": "GlobalReference",
+                            "value": "https://admin-shell.io/idta/AssetInterfacesMappingConfiguration/2/0/MappingConfiguration/Source"
+                          }
+                        ]
+                      },
+                      "value": [
+                        {
+                          "idShort": "Source",
+                          "displayName": [
+                            {
+                              "language": "en",
+                              "text": "Source"
+                            }
+                          ],
+                          "description": [
+                            {
+                              "language": "en",
+                              "text": "This holds a reference to the respective SubmodelElement used as data source. A data source can be any SubmodelElement including those defined in the InteractionMetadata of AID Submodels for fetching live-data from assets."
+                            }
+                          ],
+                          "modelType": "ReferenceElement",
+                          "semanticId": {
+                            "type": "ExternalReference",
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "https://admin-shell.io/idta/AssetInterfacesMappingConfiguration/2/0/MappingConfiguration/Source/Source"
+                              }
+                            ]
+                          },
+                          "value": {
+                            "type": "ModelReference",
+                            "keys": [
+                              {
+                                "type": "Submodel",
+                                "value": "https://example.com/ids/sm/AssetInterfacesDescription"
+                              },
+                              {
+                                "type": "SubmodelElementCollection",
+                                "value": "InterfaceMQTT"
+                              },
+                              {
+                                "type": "SubmodelElementCollection",
+                                "value": "InterfaceMetadata"
+                              },
+                              {
+                                "type": "SubmodelElementCollection",
+                                "value": "Properties"
+                              },
+                              {
+                                "type": "SubmodelElementCollection",
+                                "value": "status"
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "idShort": "SourceId",
+                          "displayName": [
+                            {
+                              "language": "en",
+                              "text": "Source ID"
+                            }
+                          ],
+                          "description": [
+                            {
+                              "language": "en",
+                              "text": "This is a unique and non-empty identifier that facilitates data access in the Lua transformation or establishes a relationship to a corresponding sink when no transformation is given. It must only be unique with respect to the Sources-list of the parent MappingConfiguration and not globally."
+                            }
+                          ],
+                          "modelType": "Property",
+                          "semanticId": {
+                            "type": "ExternalReference",
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "https://admin-shell.io/idta/AssetInterfacesMappingConfiguration/2/0/MappingConfiguration/Source/SourceId"
+                              }
+                            ]
+                          },
+                          "value": "status",
+                          "valueType": "xs:string"
+                        }
+                      ]
+                    },
+                    {
+                      "displayName": [
+                        {
+                          "language": "en",
+                          "text": "Source"
+                        }
+                      ],
+                      "description": [
+                        {
+                          "language": "en",
+                          "text": "A data source is defined by a Source reference, PollingInterval and SourceId."
+                        }
+                      ],
+                      "modelType": "SubmodelElementCollection",
+                      "semanticId": {
+                        "type": "ExternalReference",
+                        "keys": [
+                          {
+                            "type": "GlobalReference",
+                            "value": "https://admin-shell.io/idta/AssetInterfacesMappingConfiguration/2/0/MappingConfiguration/Source"
+                          }
+                        ]
+                      },
+                      "value": [
+                        {
+                          "idShort": "Source",
+                          "displayName": [
+                            {
+                              "language": "en",
+                              "text": "Source"
+                            }
+                          ],
+                          "description": [
+                            {
+                              "language": "en",
+                              "text": "This holds a reference to the respective SubmodelElement used as data source. A data source can be any SubmodelElement including those defined in the InteractionMetadata of AID Submodels for fetching live-data from assets."
+                            }
+                          ],
+                          "modelType": "ReferenceElement",
+                          "semanticId": {
+                            "type": "ExternalReference",
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "https://admin-shell.io/idta/AssetInterfacesMappingConfiguration/2/0/MappingConfiguration/Source/Source"
+                              }
+                            ]
+                          },
+                          "value": {
+                            "type": "ModelReference",
+                            "keys": [
+                              {
+                                "type": "Submodel",
+                                "value": "https://example.com/ids/sm/AssetInterfacesDescription"
+                              },
+                              {
+                                "type": "SubmodelElementCollection",
+                                "value": "InterfaceMQTT"
+                              },
+                              {
+                                "type": "SubmodelElementCollection",
+                                "value": "InterfaceMetadata"
+                              },
+                              {
+                                "type": "SubmodelElementCollection",
+                                "value": "Properties"
+                              },
+                              {
+                                "type": "SubmodelElementCollection",
+                                "value": "timestamp"
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "idShort": "SourceId",
+                          "displayName": [
+                            {
+                              "language": "en",
+                              "text": "Source ID"
+                            }
+                          ],
+                          "description": [
+                            {
+                              "language": "en",
+                              "text": "This is a unique and non-empty identifier that facilitates data access in the Lua transformation or establishes a relationship to a corresponding sink when no transformation is given. It must only be unique with respect to the Sources-list of the parent MappingConfiguration and not globally."
+                            }
+                          ],
+                          "modelType": "Property",
+                          "semanticId": {
+                            "type": "ExternalReference",
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "https://admin-shell.io/idta/AssetInterfacesMappingConfiguration/2/0/MappingConfiguration/Source/SourceId"
+                              }
+                            ]
+                          },
+                          "value": "timestamp",
+                          "valueType": "xs:string"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "idShort": "Sinks",
+                  "displayName": [
+                    {
+                      "language": "en",
+                      "text": "Sinks"
+                    }
+                  ],
+                  "description": [
+                    {
+                      "language": "en",
+                      "text": "This list includes all data sinks that are used in this MappingConfiguration."
+                    }
+                  ],
+                  "modelType": "SubmodelElementList",
+                  "semanticId": {
+                    "type": "ExternalReference",
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://admin-shell.io/idta/AssetInterfacesMappingConfiguration/2/0/MappingConfiguration/Sinks"
+                      }
+                    ]
+                  },
+                  "orderRelevant": true,
+                  "typeValueListElement": "SubmodelElementCollection",
+                  "semanticIdListElement": {
+                    "type": "ExternalReference",
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://admin-shell.io/idta/AssetInterfacesMappingConfiguration/2/0/MappingConfiguration/Sink"
+                      }
+                    ]
+                  },
+                  "value": [
+                    {
+                      "displayName": [
+                        {
+                          "language": "en",
+                          "text": "Sink"
+                        }
+                      ],
+                      "description": [
+                        {
+                          "language": "en",
+                          "text": "A data sink is defined by a Sink reference and SinkId."
+                        }
+                      ],
+                      "modelType": "SubmodelElementCollection",
+                      "semanticId": {
+                        "type": "ExternalReference",
+                        "keys": [
+                          {
+                            "type": "GlobalReference",
+                            "value": "https://admin-shell.io/idta/AssetInterfacesMappingConfiguration/2/0/MappingConfiguration/Sink"
+                          }
+                        ]
+                      },
+                      "value": [
+                        {
+                          "idShort": "Sink",
+                          "displayName": [
+                            {
+                              "language": "en",
+                              "text": "Sink"
+                            }
+                          ],
+                          "description": [
+                            {
+                              "language": "en",
+                              "text": "This holds a reference to the respective SubmodelElement used as data sink for live-data."
+                            }
+                          ],
+                          "modelType": "ReferenceElement",
+                          "semanticId": {
+                            "type": "ExternalReference",
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "https://admin-shell.io/idta/AssetInterfacesMappingConfiguration/2/0/MappingConfiguration/Sink/Sink"
+                              }
+                            ]
+                          },
+                          "value": {
+                            "type": "ModelReference",
+                            "keys": [
+                              {
+                                "type": "Submodel",
+                                "value": "https://example.com/ids/sm/MeasurementValue"
+                              },
+                              {
+                                "type": "SubmodelElementCollection",
+                                "value": "MeasuredValue"
+                              },
+                              {
+                                "type": "Property",
+                                "value": "Value"
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "idShort": "SinkId",
+                          "displayName": [
+                            {
+                              "language": "en",
+                              "text": "Sink ID"
+                            }
+                          ],
+                          "description": [
+                            {
+                              "language": "en",
+                              "text": "This is a unique and non-empty identifier that facilitates data writing in the Lua transformation or establishes a relationship to a corresponding source when no transformation is given. It must only be unique with respect to the Sinks-list of the containing MappingConfiguration and not globally."
+                            }
+                          ],
+                          "modelType": "Property",
+                          "semanticId": {
+                            "type": "ExternalReference",
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "https://admin-shell.io/idta/AssetInterfacesMappingConfiguration/2/0/MappingConfiguration/Sink/SinkId"
+                              }
+                            ]
+                          },
+                          "value": "voltage",
+                          "valueType": "xs:string"
+                        }
+                      ]
+                    },
+                    {
+                      "displayName": [
+                        {
+                          "language": "en",
+                          "text": "Sink"
+                        }
+                      ],
+                      "description": [
+                        {
+                          "language": "en",
+                          "text": "A data sink is defined by a Sink reference and SinkId."
+                        }
+                      ],
+                      "modelType": "SubmodelElementCollection",
+                      "semanticId": {
+                        "type": "ExternalReference",
+                        "keys": [
+                          {
+                            "type": "GlobalReference",
+                            "value": "https://admin-shell.io/idta/AssetInterfacesMappingConfiguration/2/0/MappingConfiguration/Sink"
+                          }
+                        ]
+                      },
+                      "value": [
+                        {
+                          "idShort": "Sink",
+                          "displayName": [
+                            {
+                              "language": "en",
+                              "text": "Sink"
+                            }
+                          ],
+                          "description": [
+                            {
+                              "language": "en",
+                              "text": "This holds a reference to the respective SubmodelElement used as data sink for live-data."
+                            }
+                          ],
+                          "modelType": "ReferenceElement",
+                          "semanticId": {
+                            "type": "ExternalReference",
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "https://admin-shell.io/idta/AssetInterfacesMappingConfiguration/2/0/MappingConfiguration/Sink/Sink"
+                              }
+                            ]
+                          },
+                          "value": {
+                            "type": "ModelReference",
+                            "keys": [
+                              {
+                                "type": "Submodel",
+                                "value": "https://example.com/ids/sm/MeasurementValue"
+                              },
+                              {
+                                "type": "SubmodelElementCollection",
+                                "value": "MeasurementQualifier"
+                              },
+                              {
+                                "type": "Property",
+                                "value": "Quality"
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "idShort": "SinkId",
+                          "displayName": [
+                            {
+                              "language": "en",
+                              "text": "Sink ID"
+                            }
+                          ],
+                          "description": [
+                            {
+                              "language": "en",
+                              "text": "This is a unique and non-empty identifier that facilitates data writing in the Lua transformation or establishes a relationship to a corresponding source when no transformation is given. It must only be unique with respect to the Sinks-list of the containing MappingConfiguration and not globally."
+                            }
+                          ],
+                          "modelType": "Property",
+                          "semanticId": {
+                            "type": "ExternalReference",
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "https://admin-shell.io/idta/AssetInterfacesMappingConfiguration/2/0/MappingConfiguration/Sink/SinkId"
+                              }
+                            ]
+                          },
+                          "value": "status",
+                          "valueType": "xs:string"
+                        }
+                      ]
+                    },
+                    {
+                      "displayName": [
+                        {
+                          "language": "en",
+                          "text": "Sink"
+                        }
+                      ],
+                      "description": [
+                        {
+                          "language": "en",
+                          "text": "A data sink is defined by a Sink reference and SinkId."
+                        }
+                      ],
+                      "modelType": "SubmodelElementCollection",
+                      "semanticId": {
+                        "type": "ExternalReference",
+                        "keys": [
+                          {
+                            "type": "GlobalReference",
+                            "value": "https://admin-shell.io/idta/AssetInterfacesMappingConfiguration/2/0/MappingConfiguration/Sink"
+                          }
+                        ]
+                      },
+                      "value": [
+                        {
+                          "idShort": "Sink",
+                          "displayName": [
+                            {
+                              "language": "en",
+                              "text": "Sink"
+                            }
+                          ],
+                          "description": [
+                            {
+                              "language": "en",
+                              "text": "This holds a reference to the respective SubmodelElement used as data sink for live-data."
+                            }
+                          ],
+                          "modelType": "ReferenceElement",
+                          "semanticId": {
+                            "type": "ExternalReference",
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "https://admin-shell.io/idta/AssetInterfacesMappingConfiguration/2/0/MappingConfiguration/Sink/Sink"
+                              }
+                            ]
+                          },
+                          "value": {
+                            "type": "ModelReference",
+                            "keys": [
+                              {
+                                "type": "Submodel",
+                                "value": "https://example.com/ids/sm/MeasurementValue"
+                              },
+                              {
+                                "type": "Property",
+                                "value": "MeasurementTimestamp"
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "idShort": "SinkId",
+                          "displayName": [
+                            {
+                              "language": "en",
+                              "text": "Sink ID"
+                            }
+                          ],
+                          "description": [
+                            {
+                              "language": "en",
+                              "text": "This is a unique and non-empty identifier that facilitates data writing in the Lua transformation or establishes a relationship to a corresponding source when no transformation is given. It must only be unique with respect to the Sinks-list of the containing MappingConfiguration and not globally."
+                            }
+                          ],
+                          "modelType": "Property",
+                          "semanticId": {
+                            "type": "ExternalReference",
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "https://admin-shell.io/idta/AssetInterfacesMappingConfiguration/2/0/MappingConfiguration/Sink/SinkId"
+                              }
+                            ]
+                          },
+                          "value": "timestamp",
+                          "valueType": "xs:string"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "idShort": "MeasurementValue",
+      "displayName": [
+        {
+          "language": "en",
+          "text": "Measurement Value"
+        }
+      ],
+      "description": [
+        {
+          "language": "en",
+          "text": "The Submodel Template for Measurement Value"
+        }
+      ],
+      "modelType": "Submodel",
+      "id": "https://example.com/ids/sm/MeasurementValue",
+      "administration": {
+        "version": "1",
+        "revision": "0"
+      },
+      "semanticId": {
+        "type": "ExternalReference",
+        "keys": [
+          {
+            "type": "GlobalReference",
+            "value": "https://admin-shell.io/idta/SubmodelTemplate/measurementValue/1/0"
+          }
+        ]
+      },
+      "submodelElements": [
+        {
+          "idShort": "MeasurementTimestamp",
+          "displayName": [
+            {
+              "language": "en",
+              "text": "Measurement Timestamp"
+            }
+          ],
+          "category": "VARIABLE",
+          "description": [
+            {
+              "language": "en",
+              "text": "Date and time when the measurement was taken."
+            }
+          ],
+          "modelType": "Property",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "0112/2///61360_7#CBA007"
+              }
+            ]
+          },
+          "supplementalSemanticIds": [
+            {
+              "type": "ExternalReference",
+              "keys": [
+                {
+                  "type": "GlobalReference",
+                  "value": "0112/2///61360_7#CBA008"
+                }
+              ]
+            }
+          ],
+          "value": "1970-01-01T00:00:00+00:00",
+          "valueType": "xs:dateTime"
+        },
+        {
+          "idShort": "MeasurementQualifier",
+          "displayName": [
+            {
+              "language": "en",
+              "text": "Measurement Qualifier"
+            }
+          ],
+          "description": [
+            {
+              "language": "en",
+              "text": "The Qualifier of the measurement"
+            }
+          ],
+          "modelType": "SubmodelElementCollection",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/idta/measurementvalue/measurementqualifier/1/0"
+              }
+            ]
+          },
+          "value": [
+            {
+              "idShort": "Quality",
+              "displayName": [
+                {
+                  "language": "en",
+                  "text": "Quality"
+                }
+              ],
+              "category": "VARIABLE",
+              "description": [
+                {
+                  "language": "en",
+                  "text": "Quality of the measured value (e.g., Good, Bad, Uncertain and others like out of range)."
+                }
+              ],
+              "modelType": "Property",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "0112/2///61360_7#CBA006"
+                  }
+                ]
+              },
+              "value": "others",
+              "valueType": "xs:string"
+            }
+          ]
+        },
+        {
+          "idShort": "MeasuredValue",
+          "displayName": [
+            {
+              "language": "en",
+              "text": "Measured Value"
+            }
+          ],
+          "description": [
+            {
+              "language": "en",
+              "text": "This is the measured value of the sensor output"
+            }
+          ],
+          "modelType": "SubmodelElementCollection",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/idta/measurementvalue/measuredvalue/1/0"
+              }
+            ]
+          },
+          "value": [
+            {
+              "idShort": "Kind",
+              "displayName": [
+                {
+                  "language": "en",
+                  "text": "Kind"
+                }
+              ],
+              "category": "PARAMETER",
+              "description": [
+                {
+                  "language": "en",
+                  "text": "Kind of measured value"
+                }
+              ],
+              "modelType": "Property",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "0112/2///62683#ACI144"
+                  }
+                ]
+              },
+              "supplementalSemanticIds": [
+                {
+                  "type": "ExternalReference",
+                  "keys": [
+                    {
+                      "type": "GlobalReference",
+                      "value": "0112/2///62683#ACI144"
+                    }
+                  ]
+                }
+              ],
+              "value": "voltage",
+              "valueType": "xs:string"
+            },
+            {
+              "idShort": "Unit",
+              "displayName": [
+                {
+                  "language": "en",
+                  "text": "Unit"
+                }
+              ],
+              "category": "PARAMETER",
+              "description": [
+                {
+                  "language": "en",
+                  "text": "The unit of the measured value"
+                }
+              ],
+              "modelType": "Property",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "0112/2///62720#UBA000"
+                  }
+                ]
+              },
+              "value": "V",
+              "valueType": "xs:string"
+            },
+            {
+              "idShort": "Value",
+              "displayName": [
+                {
+                  "language": "en",
+                  "text": "Value"
+                }
+              ],
+              "category": "VARIABLE",
+              "description": [
+                {
+                  "language": "en",
+                  "text": "The value of the of measured sensor output"
+                }
+              ],
+              "modelType": "Property",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "https://admin-shell.io/idta/measurementvalue/value/1/0"
+                  }
+                ]
+              },
+              "value": "NaN",
+              "valueType": "xs:float"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 # nodered-dmp — Node-RED Data Mapping Processor
 
-Automatically generates Node-RED flows from an [Asset Administration Shell (AAS)](https://industrialdigitaltwin.org/en/content-hub/aasspecifications) server. It reads the Asset Interfaces Mapping Configuration (AIMC) submodel and produces a ready-to-import Node-RED flow that routes data between device interfaces (MQTT, HTTP, Modbus, OPC UA).
+Automatically generates Node-RED flows from an [Asset Administration Shell (AAS)](https://industrialdigitaltwin.org/en/content-hub/aasspecifications) server. It reads the Asset Interfaces Mapping Configuration (AIMC) submodel and produces a ready-to-import Node-RED flow that routes data between device interfaces (MQTT, OPC UA).
 
 ## How it works
 
@@ -40,23 +40,17 @@ uv run pytest
 
 After each test run, the generated flow is saved to `tests/artifacts/flow.json` for manual inspection.
 
+## Supported mappings
+
+AIMC 1.0 and 2.0 support direct MQTT and OPC UA mappings to Property elements in any target submodel. MeasurementValue is an example, not a requirement. HTTP, Modbus and BACnet adapters are not implemented.
+
+AIMC 2.0 matches SourceId and SinkId. Lua transformations and AIMC 2.0 configuration write-back are not supported. OPC UA uses the existing one-second polling reader; automatic splitting of value, quality and timestamp is not supported.
+
 ## Project structure
 
-```
-nodered_dmp/
-├── aas_client.py          # HTTP communication with AAS server
-├── aimc_parser.py         # parses AIMC submodel → structured connections
-└── flow_builder/
-    ├── builder.py         # builds Node-RED flow from parsed connections
-    └── protocols/
-        ├── mqtt.py        # MQTT flow generation
-        ├── http.py        # HTTP flow generation
-        ├── modbus.py      # Modbus flow generation
-        ├── opcua.py       # OPC UA flow generation
-        └── bacnet.py      # BACnet flow generation
-main.py                    # entry point
-examples/                  # example AAS packages (.aasx)
-tests/
-├── fixtures/              # real AAS server responses used as mock data
-└── artifacts/             # generated flow output (gitignored)
-```
+- `nodered_dmp/aas/`: AID/AIMC import and configuration writing.
+- `nodered_dmp/protocols/`: registered MQTT and OPC UA adapters.
+- `nodered_dmp/flow_builder/`: shared Node-RED flow generation.
+- `nodered_dmp/parse/`: flow import and synchronization.
+- `examples/`: AIMC examples and MQTT demo stack. OPC UA requires its Node-RED palette separately.
+- `tests/`: automated tests.
